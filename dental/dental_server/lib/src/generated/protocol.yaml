@@ -12,6 +12,8 @@ jwtRefresh:
 auth:
   - patientRegister:
   - patientLogin:
+  - patientLogout:
+  - patientRefreshToken:
   - dentistRegister:
   - dentistLogin:
   - adminLogin:

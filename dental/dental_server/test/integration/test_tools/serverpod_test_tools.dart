@@ -16,7 +16,7 @@ import 'package:serverpod/serverpod.dart' as _i2;
 import 'dart:async' as _i3;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i4;
-import 'package:dental_server/src/generated/auth/patient.dart' as _i5;
+import 'package:dental_server/src/generated/auth/auth_response.dart' as _i5;
 import 'package:dental_server/src/generated/auth/dentist.dart' as _i6;
 import 'package:dental_server/src/generated/auth/admin.dart' as _i7;
 import 'package:dental_server/src/generated/greetings/greeting.dart' as _i8;
@@ -497,7 +497,7 @@ class _AuthEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i5.Patient?> patientRegister(
+  _i3.Future<_i5.AuthResponse> patientRegister(
     _i1.TestSessionBuilder sessionBuilder,
     String fullName,
     String email,
@@ -528,7 +528,7 @@ class _AuthEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i5.Patient?>);
+                as _i3.Future<_i5.AuthResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -536,7 +536,7 @@ class _AuthEndpoint {
     });
   }
 
-  _i3.Future<_i5.Patient?> patientLogin(
+  _i3.Future<_i5.AuthResponse> patientLogin(
     _i1.TestSessionBuilder sessionBuilder,
     String email,
     String password,
@@ -563,7 +563,69 @@ class _AuthEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i5.Patient?>);
+                as _i3.Future<_i5.AuthResponse>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<void> patientLogout(
+    _i1.TestSessionBuilder sessionBuilder,
+    int patientId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'auth',
+            method: 'patientLogout',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'auth',
+          methodName: 'patientLogout',
+          parameters: _i1.testObjectToJson({'patientId': patientId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i5.AuthResponse> patientRefreshToken(
+    _i1.TestSessionBuilder sessionBuilder,
+    String refreshToken,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'auth',
+            method: 'patientRefreshToken',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'auth',
+          methodName: 'patientRefreshToken',
+          parameters: _i1.testObjectToJson({'refreshToken': refreshToken}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i5.AuthResponse>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

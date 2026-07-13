@@ -31,16 +31,16 @@ webServer:
 # This is the database setup for your test server.
 database:
   host: localhost
-  port: 9090
-  name: dental_test
-  user: postgres
+  port: 5432
+  name: dental
+  user: dental
   #maxConnectionCount: 10 # Defaults to 10, a negative or null value removes the limit
 
 # This is the setup for your Redis test instance.
 redis:
-  enabled: false
+  enabled: true
   host: localhost
-  port: 9091
+  port: 6379
   #user: # defaults to empty
   #requireSsl: true # defaults to false
 

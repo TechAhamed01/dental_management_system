@@ -1,22 +1,24 @@
 import 'package:serverpod/serverpod.dart';
-import 'package:crypto/crypto.dart';
-import 'dart:convert';
 import '../generated/protocol.dart';
+import '../utils/password_utils.dart';
+import '../utils/jwt_utils.dart';
 
 class AuthEndpoint extends Endpoint {
-  String _hashPassword(String password) {
-    var bytes = utf8.encode(password);
-    var digest = sha256.convert(bytes);
-    return digest.toString();
-  }
 
-  Future<Patient?> patientRegister(
+  // PATIENT AUTHENTICATION
+
+  Future<AuthResponse> patientRegister(
     Session session,
     String fullName,
     String email,
     String phone,
     String password,
   ) async {
+    // 1. Validation
+    if (fullName.isEmpty || email.isEmpty || phone.isEmpty || password.length < 8) {
+      throw Exception('Invalid input data. Password must be at least 8 characters.');
+    }
+
     final existingPatient = await Patient.db.findFirstRow(
       session,
       where: (t) => t.email.equals(email),
@@ -26,35 +28,109 @@ class AuthEndpoint extends Endpoint {
       throw Exception('Patient with this email already exists.');
     }
 
-    final passwordHash = _hashPassword(password);
-    final patient = Patient(
+    // 2. Hash Password
+    final passwordHash = PasswordUtils.hashPassword(password);
+    var patient = Patient(
       fullName: fullName,
       email: email,
       phone: phone,
       passwordHash: passwordHash,
     );
 
-    return await Patient.db.insertRow(session, patient);
+    patient = await Patient.db.insertRow(session, patient);
+
+    // 3. Generate Tokens
+    final token = JwtUtils.generateAccessToken(patient.id!, 'patient');
+    final refreshToken = JwtUtils.generateRefreshToken(patient.id!, 'patient');
+
+    // 4. Store Refresh Token in Redis
+    await session.caches.global.put(
+      'refresh_patient_${patient.id}',
+      refreshToken,
+      lifetime: const Duration(days: 7),
+    );
+
+    return AuthResponse(
+      token: token,
+      refreshToken: refreshToken,
+      patient: patient,
+    );
   }
 
-  Future<Patient?> patientLogin(
+  Future<AuthResponse> patientLogin(
     Session session,
     String email,
     String password,
   ) async {
-    final passwordHash = _hashPassword(password);
     final patient = await Patient.db.findFirstRow(
       session,
-      where: (t) => t.email.equals(email) & t.passwordHash.equals(passwordHash),
+      where: (t) => t.email.equals(email),
     );
 
-    if (patient == null) {
+    if (patient == null || !PasswordUtils.verifyPassword(password, patient.passwordHash)) {
       throw Exception('Invalid email or password.');
     }
 
-    return patient;
+    final token = JwtUtils.generateAccessToken(patient.id!, 'patient');
+    final refreshToken = JwtUtils.generateRefreshToken(patient.id!, 'patient');
+
+    await session.caches.global.put(
+      'refresh_patient_${patient.id}',
+      refreshToken,
+      lifetime: const Duration(days: 7),
+    );
+
+    return AuthResponse(
+      token: token,
+      refreshToken: refreshToken,
+      patient: patient,
+    );
   }
 
+  Future<void> patientLogout(Session session, int patientId) async {
+    await session.caches.global.invalidateKey('refresh_patient_$patientId');
+  }
+
+  Future<AuthResponse> patientRefreshToken(Session session, String refreshToken) async {
+    final jwt = JwtUtils.verifyRefreshToken(refreshToken);
+    if (jwt == null) {
+      throw Exception('Invalid or expired refresh token.');
+    }
+
+    final userId = jwt.payload['userId'] as int;
+    final role = jwt.payload['role'] as String;
+
+    if (role != 'patient') {
+      throw Exception('Invalid role for this token.');
+    }
+
+    final storedToken = await session.caches.global.get<String>('refresh_patient_$userId');
+    if (storedToken == null || storedToken != refreshToken) {
+      throw Exception('Refresh token revoked or not found.');
+    }
+
+    final patient = await Patient.db.findById(session, userId);
+    if (patient == null) {
+      throw Exception('Patient not found.');
+    }
+
+    final newToken = JwtUtils.generateAccessToken(userId, 'patient');
+    final newRefreshToken = JwtUtils.generateRefreshToken(userId, 'patient');
+
+    await session.caches.global.put(
+      'refresh_patient_$userId',
+      newRefreshToken,
+      lifetime: const Duration(days: 7),
+    );
+
+    return AuthResponse(
+      token: newToken,
+      refreshToken: newRefreshToken,
+      patient: patient,
+    );
+  }
+
+  // DENTIST AUTHENTICATION (Placeholder using legacy style for now, to be updated in iteration 2)
   Future<Dentist?> dentistRegister(
     Session session,
     String fullName,
@@ -82,7 +158,7 @@ class AuthEndpoint extends Endpoint {
       throw Exception('Dentist with this email already exists.');
     }
 
-    final passwordHash = _hashPassword(password);
+    final passwordHash = PasswordUtils.hashPassword(password);
     final dentist = Dentist(
       fullName: fullName,
       email: email,
@@ -106,13 +182,12 @@ class AuthEndpoint extends Endpoint {
     String email,
     String password,
   ) async {
-    final passwordHash = _hashPassword(password);
     final dentist = await Dentist.db.findFirstRow(
       session,
-      where: (t) => t.email.equals(email) & t.passwordHash.equals(passwordHash),
+      where: (t) => t.email.equals(email),
     );
 
-    if (dentist == null) {
+    if (dentist == null || !PasswordUtils.verifyPassword(password, dentist.passwordHash)) {
       throw Exception('Invalid email or password.');
     }
 
@@ -125,18 +200,18 @@ class AuthEndpoint extends Endpoint {
     return dentist;
   }
 
+  // ADMIN AUTHENTICATION
   Future<Admin?> adminLogin(
     Session session,
     String email,
     String password,
   ) async {
-    final passwordHash = _hashPassword(password);
     final admin = await Admin.db.findFirstRow(
       session,
-      where: (t) => t.email.equals(email) & t.passwordHash.equals(passwordHash),
+      where: (t) => t.email.equals(email),
     );
 
-    if (admin == null) {
+    if (admin == null || !PasswordUtils.verifyPassword(password, admin.passwordHash)) {
       throw Exception('Invalid admin email or password.');
     }
 

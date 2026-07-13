@@ -1,0 +1,7 @@
+class: AuthResponse
+fields:
+  token: String
+  refreshToken: String
+  patient: Patient?
+  dentist: Dentist?
+  admin: Admin?

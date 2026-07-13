@@ -16,7 +16,7 @@ import 'package:serverpod_client/serverpod_client.dart' as _i2;
 import 'dart:async' as _i3;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i4;
-import 'package:dental_client/src/protocol/auth/patient.dart' as _i5;
+import 'package:dental_client/src/protocol/auth/auth_response.dart' as _i5;
 import 'package:dental_client/src/protocol/auth/dentist.dart' as _i6;
 import 'package:dental_client/src/protocol/auth/admin.dart' as _i7;
 import 'package:dental_client/src/protocol/greetings/greeting.dart' as _i8;
@@ -250,12 +250,12 @@ class EndpointAuth extends _i2.EndpointRef {
   @override
   String get name => 'auth';
 
-  _i3.Future<_i5.Patient?> patientRegister(
+  _i3.Future<_i5.AuthResponse> patientRegister(
     String fullName,
     String email,
     String phone,
     String password,
-  ) => caller.callServerEndpoint<_i5.Patient?>(
+  ) => caller.callServerEndpoint<_i5.AuthResponse>(
     'auth',
     'patientRegister',
     {
@@ -266,10 +266,10 @@ class EndpointAuth extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i5.Patient?> patientLogin(
+  _i3.Future<_i5.AuthResponse> patientLogin(
     String email,
     String password,
-  ) => caller.callServerEndpoint<_i5.Patient?>(
+  ) => caller.callServerEndpoint<_i5.AuthResponse>(
     'auth',
     'patientLogin',
     {
@@ -277,6 +277,20 @@ class EndpointAuth extends _i2.EndpointRef {
       'password': password,
     },
   );
+
+  _i3.Future<void> patientLogout(int patientId) =>
+      caller.callServerEndpoint<void>(
+        'auth',
+        'patientLogout',
+        {'patientId': patientId},
+      );
+
+  _i3.Future<_i5.AuthResponse> patientRefreshToken(String refreshToken) =>
+      caller.callServerEndpoint<_i5.AuthResponse>(
+        'auth',
+        'patientRefreshToken',
+        {'refreshToken': refreshToken},
+      );
 
   _i3.Future<_i6.Dentist?> dentistRegister(
     String fullName,

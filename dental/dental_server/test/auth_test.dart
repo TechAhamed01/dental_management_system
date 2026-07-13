@@ -1,22 +1,23 @@
 import 'package:test/test.dart';
+import 'package:dental_server/src/utils/password_utils.dart';
+import 'package:dental_server/src/utils/jwt_utils.dart';
 
 void main() {
-  group('Auth Endpoint Unit Tests', () {
-    test('Patient registration successfully hashes password and saves', () {
-      // TODO: Use generated Serverpod test tools for complete test
-      expect(true, true);
+  group('Auth Unit Tests', () {
+    test('Password hashing creates distinct hash from password', () {
+      final pass = 'securePassword123';
+      final hash = PasswordUtils.hashPassword(pass);
+      expect(hash, isNot(equals(pass)));
+      expect(PasswordUtils.verifyPassword(pass, hash), isTrue);
+      expect(PasswordUtils.verifyPassword('wrong', hash), isFalse);
     });
 
-    test('Dentist registration successfully sets pending status', () {
-      expect(true, true);
-    });
-
-    test('Dentist login fails if pending status', () {
-      expect(true, true);
-    });
-    
-    test('Admin can approve pending dentists', () {
-      expect(true, true);
+    test('JWT generation and verification works', () {
+      final token = JwtUtils.generateAccessToken(1, 'patient');
+      final jwt = JwtUtils.verifyAccessToken(token);
+      expect(jwt, isNotNull);
+      expect(jwt!.payload['userId'], equals(1));
+      expect(jwt.payload['role'], equals('patient'));
     });
   });
 }

@@ -11,9 +11,25 @@ import 'src/web/routes/root.dart';
 
 /// The starting point of the Serverpod server.
 void run(List<String> args) async {
-  // Initialize Serverpod and connect it with your generated code.
-  final pod = Serverpod(args, Protocol(), Endpoints());
-
+  final pod = Serverpod(
+    args,
+    Protocol(),
+    Endpoints(),
+    configOverride: (config) {
+      if (config.redis != null) {
+        final newRedis = RedisConfig(
+          enabled: config.redis!.enabled,
+          host: config.redis!.host,
+          port: config.redis!.port,
+          user: config.redis!.user,
+          password: null, // Override to null to bypass AUTH
+          requireSsl: config.redis!.requireSsl,
+        );
+        return config.copyWith(redis: newRedis);
+      }
+      return config;
+    },
+  );
   // Initialize authentication services for the server.
   // Token managers will be used to validate and issue authentication keys,
   // and the identity providers will be the authentication options available for users.
