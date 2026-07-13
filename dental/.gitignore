@@ -4,3 +4,14 @@
 
 # Pubspec overrides
 pubspec_overrides.yaml
+
+# Serverpod secrets
+config/passwords.yaml
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
