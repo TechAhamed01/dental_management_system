@@ -1,0 +1,7 @@
+class: Patient
+table: patient
+fields:
+  fullName: String
+  email: String
+  phone: String
+  passwordHash: String

@@ -1,0 +1,22 @@
+emailIdp:
+  - login:
+  - startRegistration:
+  - verifyRegistrationCode:
+  - finishRegistration:
+  - startPasswordReset:
+  - verifyPasswordResetCode:
+  - finishPasswordReset:
+  - hasAccount:
+jwtRefresh:
+  - refreshAccessToken:
+auth:
+  - patientRegister:
+  - patientLogin:
+  - dentistRegister:
+  - dentistLogin:
+  - adminLogin:
+  - getPendingDentists:
+  - approveDentist:
+  - rejectDentist:
+greeting:
+  - hello:

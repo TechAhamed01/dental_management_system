@@ -1,0 +1,5 @@
+class: Admin
+table: admin
+fields:
+  email: String
+  passwordHash: String

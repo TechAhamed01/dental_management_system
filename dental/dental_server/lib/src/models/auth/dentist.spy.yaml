@@ -1,0 +1,15 @@
+class: Dentist
+table: dentist
+fields:
+  fullName: String
+  email: String
+  phone: String
+  passwordHash: String
+  licenseNumber: String
+  specialization: String
+  experience: int
+  clinicName: String
+  clinicAddress: String
+  profilePhotoUrl: String?
+  isTermsAccepted: bool
+  status: DentistStatus

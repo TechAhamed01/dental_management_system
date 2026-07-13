@@ -1,0 +1,6 @@
+class: Certificate
+table: certificate
+fields:
+  dentistId: int
+  dentist: Dentist?, relation(field=dentistId)
+  fileUrl: String

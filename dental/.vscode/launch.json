@@ -1,0 +1,38 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "dental_flutter",
+            "cwd": "${workspaceFolder}/dental_flutter",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart"
+        },
+        {
+            "name": "dental_server",
+            "cwd": "${workspaceFolder}/dental_server",
+            "request": "launch",
+            "type": "dart",
+            "preLaunchTask": "docker_compose_up",
+            "program": "bin/main.dart",
+            "env": {
+                "SERVERPOD_PASSWORD_database": "eiiJev8KBqEzRKhUgL0_E-xadA7dt6mu"
+            },
+            "args": [
+                "--apply-migrations"
+            ]
+        }
+    ],
+    "compounds": [
+        {
+            "name": "dental (full stack)",
+            "configurations": [
+                "dental_server",
+                "dental_flutter"
+            ],
+            "presentation": {
+                "order": 1
+            }
+        }
+    ]
+}
