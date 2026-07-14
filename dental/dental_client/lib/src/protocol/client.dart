@@ -19,8 +19,10 @@ import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
 import 'package:dental_client/src/protocol/auth/auth_response.dart' as _i5;
 import 'package:dental_client/src/protocol/auth/dentist.dart' as _i6;
 import 'package:dental_client/src/protocol/auth/admin.dart' as _i7;
-import 'package:dental_client/src/protocol/greetings/greeting.dart' as _i8;
-import 'protocol.dart' as _i9;
+import 'package:dental_client/src/protocol/auth/dashboard_stats.dart' as _i8;
+import 'package:dental_client/src/protocol/auth/patient.dart' as _i9;
+import 'package:dental_client/src/protocol/greetings/greeting.dart' as _i10;
+import 'protocol.dart' as _i11;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -366,6 +368,41 @@ class EndpointAuth extends _i2.EndpointRef {
         'rejectDentist',
         {'dentistId': dentistId},
       );
+
+  _i3.Future<_i8.DashboardStats> getDashboardStats() =>
+      caller.callServerEndpoint<_i8.DashboardStats>(
+        'auth',
+        'getDashboardStats',
+        {},
+      );
+
+  _i3.Future<List<_i9.Patient>> getAllPatients() =>
+      caller.callServerEndpoint<List<_i9.Patient>>(
+        'auth',
+        'getAllPatients',
+        {},
+      );
+
+  _i3.Future<List<_i6.Dentist>> getAllDentists() =>
+      caller.callServerEndpoint<List<_i6.Dentist>>(
+        'auth',
+        'getAllDentists',
+        {},
+      );
+
+  _i3.Future<List<_i6.Dentist>> getApprovedDentists() =>
+      caller.callServerEndpoint<List<_i6.Dentist>>(
+        'auth',
+        'getApprovedDentists',
+        {},
+      );
+
+  _i3.Future<List<_i6.Dentist>> getRejectedDentists() =>
+      caller.callServerEndpoint<List<_i6.Dentist>>(
+        'auth',
+        'getRejectedDentists',
+        {},
+      );
 }
 
 /// This is an example endpoint that returns a greeting message through
@@ -378,8 +415,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i8.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i8.Greeting>(
+  _i3.Future<_i10.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i10.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -417,7 +454,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i9.Protocol(),
+         _i11.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,

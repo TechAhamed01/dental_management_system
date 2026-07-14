@@ -528,6 +528,58 @@ class Endpoints extends _i1.EndpointDispatch {
                 params['dentistId'],
               ),
         ),
+        'getDashboardStats': _i1.MethodConnector(
+          name: 'getDashboardStats',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['auth'] as _i4.AuthEndpoint)
+                  .getDashboardStats(session),
+        ),
+        'getAllPatients': _i1.MethodConnector(
+          name: 'getAllPatients',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['auth'] as _i4.AuthEndpoint).getAllPatients(
+                session,
+              ),
+        ),
+        'getAllDentists': _i1.MethodConnector(
+          name: 'getAllDentists',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['auth'] as _i4.AuthEndpoint).getAllDentists(
+                session,
+              ),
+        ),
+        'getApprovedDentists': _i1.MethodConnector(
+          name: 'getApprovedDentists',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['auth'] as _i4.AuthEndpoint)
+                  .getApprovedDentists(session),
+        ),
+        'getRejectedDentists': _i1.MethodConnector(
+          name: 'getRejectedDentists',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['auth'] as _i4.AuthEndpoint)
+                  .getRejectedDentists(session),
+        ),
       },
     );
     connectors['greeting'] = _i1.EndpointConnector(

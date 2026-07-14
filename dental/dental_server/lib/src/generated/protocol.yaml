@@ -20,5 +20,10 @@ auth:
   - getPendingDentists:
   - approveDentist:
   - rejectDentist:
+  - getDashboardStats:
+  - getAllPatients:
+  - getAllDentists:
+  - getApprovedDentists:
+  - getRejectedDentists:
 greeting:
   - hello:

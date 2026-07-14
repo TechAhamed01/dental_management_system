@@ -1,0 +1,7 @@
+class: DashboardStats
+fields:
+  totalPatients: int
+  totalDoctors: int
+  pendingDoctors: int
+  approvedDoctors: int
+  rejectedDoctors: int

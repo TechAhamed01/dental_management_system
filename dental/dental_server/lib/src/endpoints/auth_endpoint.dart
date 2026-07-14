@@ -244,4 +244,34 @@ class AuthEndpoint extends Endpoint {
     dentist.status = DentistStatus.rejected;
     return await Dentist.db.updateRow(session, dentist);
   }
+  Future<DashboardStats> getDashboardStats(Session session) async {
+    final totalPatients = await Patient.db.count(session);
+    final totalDoctors = await Dentist.db.count(session);
+    final pendingDoctors = await Dentist.db.count(session, where: (t) => t.status.equals(DentistStatus.pending));
+    final approvedDoctors = await Dentist.db.count(session, where: (t) => t.status.equals(DentistStatus.approved));
+    final rejectedDoctors = await Dentist.db.count(session, where: (t) => t.status.equals(DentistStatus.rejected));
+
+    return DashboardStats(
+      totalPatients: totalPatients,
+      totalDoctors: totalDoctors,
+      pendingDoctors: pendingDoctors,
+      approvedDoctors: approvedDoctors,
+      rejectedDoctors: rejectedDoctors,
+    );
+  }
+  Future<List<Patient>> getAllPatients(Session session) async {
+    return await Patient.db.find(session);
+  }
+
+  Future<List<Dentist>> getAllDentists(Session session) async {
+    return await Dentist.db.find(session);
+  }
+
+  Future<List<Dentist>> getApprovedDentists(Session session) async {
+    return await Dentist.db.find(session, where: (t) => t.status.equals(DentistStatus.approved));
+  }
+
+  Future<List<Dentist>> getRejectedDentists(Session session) async {
+    return await Dentist.db.find(session, where: (t) => t.status.equals(DentistStatus.rejected));
+  }
 }
