@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'controllers/login_controller.dart';
 import 'screens/landing_page.dart';
+import 'services/serverpod_client.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeServerpod();
   runApp(const DentalCareApp());
 }
 
@@ -10,10 +15,15 @@ class DentalCareApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'DentalCare',
-      home: const LandingPage(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => LoginController()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'DentalCare',
+        home: const LandingPage(),
+      ),
     );
   }
 }

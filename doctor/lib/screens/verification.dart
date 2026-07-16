@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:dental_client/dental_client.dart' as dc;
+import '../services/serverpod_client.dart';
 
 import '../models/registration_data.dart';
 import '../utils/colors.dart';
@@ -61,8 +61,6 @@ class _VerificationState extends State<Verification> {
     });
 
     try {
-      final client = dc.Client('http://localhost:8080/');
-
       final res = await client.auth.dentistRegister(
         widget.data.fullName,
         widget.data.email,

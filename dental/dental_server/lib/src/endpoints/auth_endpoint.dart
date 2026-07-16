@@ -191,12 +191,6 @@ class AuthEndpoint extends Endpoint {
       throw Exception('Invalid email or password.');
     }
 
-    if (dentist.status == DentistStatus.pending) {
-      throw Exception('Your account is under review.');
-    } else if (dentist.status == DentistStatus.rejected) {
-      throw Exception('Your application has been rejected.');
-    }
-
     return dentist;
   }
 

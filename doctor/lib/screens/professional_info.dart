@@ -132,7 +132,7 @@ class _ProfessionalInfoState extends State<ProfessionalInfo> {
                 const SizedBox(height: 8),
 
                 DropdownButtonFormField<String>(
-                  value: selectedSpecialization,
+                  initialValue: selectedSpecialization,
                   decoration: fieldDecoration("Select Specialization"),
                   items: const [
 
@@ -189,7 +189,7 @@ class _ProfessionalInfoState extends State<ProfessionalInfo> {
                 const SizedBox(height: 8),
 
                 DropdownButtonFormField<String>(
-                  value: selectedQualification,
+                  initialValue: selectedQualification,
                   decoration: fieldDecoration("Select Qualification"),
                   items: const [
 
@@ -236,7 +236,7 @@ class _ProfessionalInfoState extends State<ProfessionalInfo> {
                 const SizedBox(height: 8),
 
                 DropdownButtonFormField<String>(
-                  value: selectedExperience,
+                  initialValue: selectedExperience,
                   decoration: fieldDecoration("Select Experience"),
                   items: const [
 
