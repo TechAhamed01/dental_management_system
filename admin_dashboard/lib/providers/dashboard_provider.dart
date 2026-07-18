@@ -14,6 +14,7 @@ class DashboardProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   Future<void> fetchDashboardData() async {
+    _errorMessage = null;
     _setLoading(true);
     try {
       final dentists = await client.auth.getPendingDentists();
@@ -22,13 +23,16 @@ class DashboardProvider extends ChangeNotifier {
       _stats = statsData;
       _errorMessage = null;
     } catch (e) {
-      _errorMessage = 'Failed to load dashboard data.';
+      debugPrint('fetchDashboardData error: $e');
+      _errorMessage = 'Failed to load dashboard data: ${e.toString().replaceAll('Exception: ', '')}';
     } finally {
       _setLoading(false);
     }
   }
 
   Future<bool> approveDentist(int id) async {
+    _errorMessage = null;
+    notifyListeners();
     try {
       await client.auth.approveDentist(id);
       _pendingDentists.removeWhere((d) => d.id == id);
@@ -44,13 +48,16 @@ class DashboardProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = 'Failed to approve dentist.';
+      debugPrint('approveDentist error: $e');
+      _errorMessage = 'Failed to approve dentist: ${e.toString().replaceAll('Exception: ', '')}';
       notifyListeners();
       return false;
     }
   }
 
   Future<bool> rejectDentist(int id) async {
+    _errorMessage = null;
+    notifyListeners();
     try {
       await client.auth.rejectDentist(id);
       _pendingDentists.removeWhere((d) => d.id == id);
@@ -66,7 +73,8 @@ class DashboardProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = 'Failed to reject dentist.';
+      debugPrint('rejectDentist error: $e');
+      _errorMessage = 'Failed to reject dentist: ${e.toString().replaceAll('Exception: ', '')}';
       notifyListeners();
       return false;
     }

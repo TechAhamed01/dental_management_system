@@ -329,6 +329,7 @@ class _ProfessionalInfoState extends State<ProfessionalInfo> {
                       // update shared data and navigate
                       widget.data.licenseNumber = registrationController.text.trim();
                       widget.data.specialization = selectedSpecialization ?? '';
+                      widget.data.qualification = selectedQualification ?? '';
 
                       // map experience selection to an integer
                       switch (selectedExperience) {

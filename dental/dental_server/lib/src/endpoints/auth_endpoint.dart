@@ -130,19 +130,24 @@ class AuthEndpoint extends Endpoint {
     );
   }
 
-  // DENTIST AUTHENTICATION (Placeholder using legacy style for now, to be updated in iteration 2)
+  // DENTIST AUTHENTICATION
   Future<Dentist?> dentistRegister(
     Session session,
     String fullName,
     String email,
     String phone,
     String password,
+    String? dateOfBirth,
     String licenseNumber,
     String specialization,
+    String? qualification,
     int experience,
     String clinicName,
     String clinicAddress,
     String? profilePhotoUrl,
+    String? registrationFileUrl,
+    String? degreeFileUrl,
+    String? idFileUrl,
     bool isTermsAccepted,
   ) async {
     if (!isTermsAccepted) {
@@ -164,12 +169,17 @@ class AuthEndpoint extends Endpoint {
       email: email,
       phone: phone,
       passwordHash: passwordHash,
+      dateOfBirth: dateOfBirth,
       licenseNumber: licenseNumber,
       specialization: specialization,
+      qualification: qualification,
       experience: experience,
       clinicName: clinicName,
       clinicAddress: clinicAddress,
       profilePhotoUrl: profilePhotoUrl,
+      registrationFileUrl: registrationFileUrl,
+      degreeFileUrl: degreeFileUrl,
+      idFileUrl: idFileUrl,
       isTermsAccepted: isTermsAccepted,
       status: DentistStatus.pending,
     );

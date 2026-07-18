@@ -245,6 +245,7 @@ class _BasicInfoState extends State<BasicInfo> {
                                 email: emailController.text.trim(),
                                 phone: phoneController.text.trim(),
                                 password: passwordController.text,
+                                dateOfBirth: dobController.text.trim(),
                               ),
                             ),
                           ),

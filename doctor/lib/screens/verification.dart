@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import '../services/serverpod_client.dart';
@@ -18,26 +20,72 @@ class Verification extends StatefulWidget {
 }
 
 class _VerificationState extends State<Verification> {
-  String? registrationFile;
-  String? degreeFile;
-  String? idFile;
+  String? registrationFileData;
+  String? degreeFileData;
+  String? idFileData;
+
+  String? registrationFileName;
+  String? degreeFileName;
+  String? idFileName;
 
   bool confirm = false;
   bool _loading = false;
 
-  Future<void> _pickFile(void Function(String fileName) onPicked) async {
+  Future<void> _pickFile(
+    void Function(String fileName, String fileData) onPicked,
+  ) async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+      withData: true,
     );
 
     if (result != null && result.files.isNotEmpty) {
-      onPicked(result.files.single.name);
+      final file = result.files.single;
+      final name = file.name;
+      List<int>? bytes = file.bytes;
+      if (bytes == null && file.path != null) {
+        try {
+          bytes = File(file.path!).readAsBytesSync();
+        } catch (e) {
+          debugPrint("Failed to read file path: $e");
+        }
+      }
+
+      if (bytes != null) {
+        if (bytes.length > 10 * 1024 * 1024) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'File is too large! Please upload a file smaller than 10 MB.',
+              ),
+            ),
+          );
+          return;
+        }
+        String mimeType = 'application/octet-stream';
+        final lower = name.toLowerCase();
+        if (lower.endsWith('.png')) {
+          mimeType = 'image/png';
+        } else if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) {
+          mimeType = 'image/jpeg';
+        } else if (lower.endsWith('.pdf')) {
+          mimeType = 'application/pdf';
+        }
+        final base64String = base64Encode(bytes);
+        final fileData = '$name|data:$mimeType;base64,$base64String';
+        onPicked(name, fileData);
+      } else {
+        onPicked(name, name);
+      }
     }
   }
 
   Future<void> _submitRegistration() async {
-    if (registrationFile == null || degreeFile == null || idFile == null) {
+    if (registrationFileData == null ||
+        degreeFileData == null ||
+        idFileData == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please upload all documents')),
       );
@@ -51,9 +99,9 @@ class _VerificationState extends State<Verification> {
       return;
     }
 
-    widget.data.registrationFile = registrationFile;
-    widget.data.degreeFile = degreeFile;
-    widget.data.idFile = idFile;
+    widget.data.registrationFile = registrationFileData;
+    widget.data.degreeFile = degreeFileData;
+    widget.data.idFile = idFileData;
     widget.data.isTermsAccepted = confirm;
 
     setState(() {
@@ -66,12 +114,17 @@ class _VerificationState extends State<Verification> {
         widget.data.email,
         widget.data.phone,
         widget.data.password,
+        widget.data.dateOfBirth,
         widget.data.licenseNumber,
         widget.data.specialization,
+        widget.data.qualification,
         widget.data.experience,
         widget.data.clinicName,
         widget.data.clinicAddress,
         null,
+        widget.data.registrationFile,
+        widget.data.degreeFile,
+        widget.data.idFile,
         widget.data.isTermsAccepted,
       );
 
@@ -209,36 +262,39 @@ class _VerificationState extends State<Verification> {
               const SizedBox(height: 30),
               _buildUploadCard(
                 title: 'Medical Registration Certificate',
-                fileName: registrationFile,
+                fileName: registrationFileName,
                 icon: Icons.description_outlined,
                 onTap: () {
-                  _pickFile((fileName) {
+                  _pickFile((fileName, fileData) {
                     setState(() {
-                      registrationFile = fileName;
+                      registrationFileName = fileName;
+                      registrationFileData = fileData;
                     });
                   });
                 },
               ),
               _buildUploadCard(
                 title: 'Degree Certificate',
-                fileName: degreeFile,
+                fileName: degreeFileName,
                 icon: Icons.school_outlined,
                 onTap: () {
-                  _pickFile((fileName) {
+                  _pickFile((fileName, fileData) {
                     setState(() {
-                      degreeFile = fileName;
+                      degreeFileName = fileName;
+                      degreeFileData = fileData;
                     });
                   });
                 },
               ),
               _buildUploadCard(
                 title: 'Government ID',
-                fileName: idFile,
+                fileName: idFileName,
                 icon: Icons.badge_outlined,
                 onTap: () {
-                  _pickFile((fileName) {
+                  _pickFile((fileName, fileData) {
                     setState(() {
-                      idFile = fileName;
+                      idFileName = fileName;
+                      idFileData = fileData;
                     });
                   });
                 },

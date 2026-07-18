@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../providers/dashboard_provider.dart';
 import '../utils/theme.dart';
+import '../utils/dentist_details_dialog.dart';
 import 'package:dental_client/dental_client.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -43,7 +44,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  void _showDentistsDialog(BuildContext context, String title, Future<List<Dentist>> Function() fetcher) async {
+  void _showDentistsDialog(
+    BuildContext context,
+    String title,
+    Future<List<Dentist>> Function() fetcher,
+  ) async {
+    final provider = context.read<DashboardProvider>();
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -56,8 +62,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
         context,
         title: title,
         items: dentists,
-        columns: const ['Name', 'Email', 'Phone', 'Specialization', 'Clinic', 'Status'],
-        rowBuilder: (d) => [d.fullName, d.email, d.phone, d.specialization, d.clinicName, d.status.name.toUpperCase()],
+        columns: const [
+          'Name',
+          'Email',
+          'Phone',
+          'Specialization',
+          'Clinic',
+          'Status',
+        ],
+        rowBuilder: (d) => [
+          d.fullName,
+          d.email,
+          d.phone,
+          d.specialization,
+          d.clinicName,
+          d.status.name.toUpperCase(),
+        ],
+        onViewDetails: (dentist) {
+          showDentistDetailsDialog(
+            context,
+            dentist,
+            provider,
+            readOnly: dentist.status != DentistStatus.pending,
+          );
+        },
       );
     } catch (e) {
       Navigator.pop(context);
@@ -70,6 +98,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required List<T> items,
     required List<String> columns,
     required List<String> Function(T) rowBuilder,
+    void Function(T item)? onViewDetails,
   }) {
     showDialog(
       context: context,
@@ -77,7 +106,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Container(
-            width: 800,
+            width: 850,
             constraints: const BoxConstraints(maxHeight: 600),
             padding: const EdgeInsets.all(24),
             child: Column(
@@ -102,17 +131,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             scrollDirection: Axis.horizontal,
                             child: DataTable(
                               headingRowColor: MaterialStateProperty.all(AppTheme.backgroundColor),
-                              columns: columns
-                                  .map((c) => DataColumn(
-                                        label: Text(c, style: const TextStyle(fontWeight: FontWeight.bold)),
-                                      ))
-                                  .toList(),
+                              columns: [
+                                ...columns.map((c) => DataColumn(
+                                      label: Text(c, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                    )),
+                                if (onViewDetails != null)
+                                  const DataColumn(
+                                    label: Text('Actions', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  ),
+                              ],
                               rows: items.map((item) {
                                 final rowData = rowBuilder(item);
                                 return DataRow(
-                                  cells: rowData
-                                      .map((data) => DataCell(Text(data)))
-                                      .toList(),
+                                  cells: [
+                                    ...rowData.map((data) => DataCell(Text(data))),
+                                    if (onViewDetails != null)
+                                      DataCell(
+                                        TextButton.icon(
+                                          icon: const Icon(Icons.visibility_outlined, size: 16),
+                                          label: const Text('View Details'),
+                                          onPressed: () => onViewDetails(item),
+                                        ),
+                                      ),
+                                  ],
                                 );
                               }).toList(),
                             ),

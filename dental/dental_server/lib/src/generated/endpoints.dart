@@ -378,6 +378,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
+            'dateOfBirth': _i1.ParameterDescription(
+              name: 'dateOfBirth',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
             'licenseNumber': _i1.ParameterDescription(
               name: 'licenseNumber',
               type: _i1.getType<String>(),
@@ -387,6 +392,11 @@ class Endpoints extends _i1.EndpointDispatch {
               name: 'specialization',
               type: _i1.getType<String>(),
               nullable: false,
+            ),
+            'qualification': _i1.ParameterDescription(
+              name: 'qualification',
+              type: _i1.getType<String?>(),
+              nullable: true,
             ),
             'experience': _i1.ParameterDescription(
               name: 'experience',
@@ -408,6 +418,21 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String?>(),
               nullable: true,
             ),
+            'registrationFileUrl': _i1.ParameterDescription(
+              name: 'registrationFileUrl',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'degreeFileUrl': _i1.ParameterDescription(
+              name: 'degreeFileUrl',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'idFileUrl': _i1.ParameterDescription(
+              name: 'idFileUrl',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
             'isTermsAccepted': _i1.ParameterDescription(
               name: 'isTermsAccepted',
               type: _i1.getType<bool>(),
@@ -425,12 +450,17 @@ class Endpoints extends _i1.EndpointDispatch {
                     params['email'],
                     params['phone'],
                     params['password'],
+                    params['dateOfBirth'],
                     params['licenseNumber'],
                     params['specialization'],
+                    params['qualification'],
                     params['experience'],
                     params['clinicName'],
                     params['clinicAddress'],
                     params['profilePhotoUrl'],
+                    params['registrationFileUrl'],
+                    params['degreeFileUrl'],
+                    params['idFileUrl'],
                     params['isTermsAccepted'],
                   ),
         ),

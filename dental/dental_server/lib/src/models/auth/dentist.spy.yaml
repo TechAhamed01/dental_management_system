@@ -5,11 +5,16 @@ fields:
   email: String
   phone: String
   passwordHash: String
+  dateOfBirth: String?
   licenseNumber: String
   specialization: String
+  qualification: String?
   experience: int
   clinicName: String
   clinicAddress: String
   profilePhotoUrl: String?
+  registrationFileUrl: String?
+  degreeFileUrl: String?
+  idFileUrl: String?
   isTermsAccepted: bool
   status: DentistStatus

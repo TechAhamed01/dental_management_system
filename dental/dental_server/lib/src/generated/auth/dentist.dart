@@ -21,12 +21,17 @@ abstract class Dentist
     required this.email,
     required this.phone,
     required this.passwordHash,
+    this.dateOfBirth,
     required this.licenseNumber,
     required this.specialization,
+    this.qualification,
     required this.experience,
     required this.clinicName,
     required this.clinicAddress,
     this.profilePhotoUrl,
+    this.registrationFileUrl,
+    this.degreeFileUrl,
+    this.idFileUrl,
     required this.isTermsAccepted,
     required this.status,
   });
@@ -37,12 +42,17 @@ abstract class Dentist
     required String email,
     required String phone,
     required String passwordHash,
+    String? dateOfBirth,
     required String licenseNumber,
     required String specialization,
+    String? qualification,
     required int experience,
     required String clinicName,
     required String clinicAddress,
     String? profilePhotoUrl,
+    String? registrationFileUrl,
+    String? degreeFileUrl,
+    String? idFileUrl,
     required bool isTermsAccepted,
     required _i2.DentistStatus status,
   }) = _DentistImpl;
@@ -54,12 +64,17 @@ abstract class Dentist
       email: jsonSerialization['email'] as String,
       phone: jsonSerialization['phone'] as String,
       passwordHash: jsonSerialization['passwordHash'] as String,
+      dateOfBirth: jsonSerialization['dateOfBirth'] as String?,
       licenseNumber: jsonSerialization['licenseNumber'] as String,
       specialization: jsonSerialization['specialization'] as String,
+      qualification: jsonSerialization['qualification'] as String?,
       experience: jsonSerialization['experience'] as int,
       clinicName: jsonSerialization['clinicName'] as String,
       clinicAddress: jsonSerialization['clinicAddress'] as String,
       profilePhotoUrl: jsonSerialization['profilePhotoUrl'] as String?,
+      registrationFileUrl: jsonSerialization['registrationFileUrl'] as String?,
+      degreeFileUrl: jsonSerialization['degreeFileUrl'] as String?,
+      idFileUrl: jsonSerialization['idFileUrl'] as String?,
       isTermsAccepted: _i1.BoolJsonExtension.fromJson(
         jsonSerialization['isTermsAccepted'],
       ),
@@ -84,9 +99,13 @@ abstract class Dentist
 
   String passwordHash;
 
+  String? dateOfBirth;
+
   String licenseNumber;
 
   String specialization;
+
+  String? qualification;
 
   int experience;
 
@@ -95,6 +114,12 @@ abstract class Dentist
   String clinicAddress;
 
   String? profilePhotoUrl;
+
+  String? registrationFileUrl;
+
+  String? degreeFileUrl;
+
+  String? idFileUrl;
 
   bool isTermsAccepted;
 
@@ -112,12 +137,17 @@ abstract class Dentist
     String? email,
     String? phone,
     String? passwordHash,
+    String? dateOfBirth,
     String? licenseNumber,
     String? specialization,
+    String? qualification,
     int? experience,
     String? clinicName,
     String? clinicAddress,
     String? profilePhotoUrl,
+    String? registrationFileUrl,
+    String? degreeFileUrl,
+    String? idFileUrl,
     bool? isTermsAccepted,
     _i2.DentistStatus? status,
   });
@@ -130,12 +160,18 @@ abstract class Dentist
       'email': email,
       'phone': phone,
       'passwordHash': passwordHash,
+      if (dateOfBirth != null) 'dateOfBirth': dateOfBirth,
       'licenseNumber': licenseNumber,
       'specialization': specialization,
+      if (qualification != null) 'qualification': qualification,
       'experience': experience,
       'clinicName': clinicName,
       'clinicAddress': clinicAddress,
       if (profilePhotoUrl != null) 'profilePhotoUrl': profilePhotoUrl,
+      if (registrationFileUrl != null)
+        'registrationFileUrl': registrationFileUrl,
+      if (degreeFileUrl != null) 'degreeFileUrl': degreeFileUrl,
+      if (idFileUrl != null) 'idFileUrl': idFileUrl,
       'isTermsAccepted': isTermsAccepted,
       'status': status.toJson(),
     };
@@ -150,12 +186,18 @@ abstract class Dentist
       'email': email,
       'phone': phone,
       'passwordHash': passwordHash,
+      if (dateOfBirth != null) 'dateOfBirth': dateOfBirth,
       'licenseNumber': licenseNumber,
       'specialization': specialization,
+      if (qualification != null) 'qualification': qualification,
       'experience': experience,
       'clinicName': clinicName,
       'clinicAddress': clinicAddress,
       if (profilePhotoUrl != null) 'profilePhotoUrl': profilePhotoUrl,
+      if (registrationFileUrl != null)
+        'registrationFileUrl': registrationFileUrl,
+      if (degreeFileUrl != null) 'degreeFileUrl': degreeFileUrl,
+      if (idFileUrl != null) 'idFileUrl': idFileUrl,
       'isTermsAccepted': isTermsAccepted,
       'status': status.toJson(),
     };
@@ -200,12 +242,17 @@ class _DentistImpl extends Dentist {
     required String email,
     required String phone,
     required String passwordHash,
+    String? dateOfBirth,
     required String licenseNumber,
     required String specialization,
+    String? qualification,
     required int experience,
     required String clinicName,
     required String clinicAddress,
     String? profilePhotoUrl,
+    String? registrationFileUrl,
+    String? degreeFileUrl,
+    String? idFileUrl,
     required bool isTermsAccepted,
     required _i2.DentistStatus status,
   }) : super._(
@@ -214,12 +261,17 @@ class _DentistImpl extends Dentist {
          email: email,
          phone: phone,
          passwordHash: passwordHash,
+         dateOfBirth: dateOfBirth,
          licenseNumber: licenseNumber,
          specialization: specialization,
+         qualification: qualification,
          experience: experience,
          clinicName: clinicName,
          clinicAddress: clinicAddress,
          profilePhotoUrl: profilePhotoUrl,
+         registrationFileUrl: registrationFileUrl,
+         degreeFileUrl: degreeFileUrl,
+         idFileUrl: idFileUrl,
          isTermsAccepted: isTermsAccepted,
          status: status,
        );
@@ -234,12 +286,17 @@ class _DentistImpl extends Dentist {
     String? email,
     String? phone,
     String? passwordHash,
+    Object? dateOfBirth = _Undefined,
     String? licenseNumber,
     String? specialization,
+    Object? qualification = _Undefined,
     int? experience,
     String? clinicName,
     String? clinicAddress,
     Object? profilePhotoUrl = _Undefined,
+    Object? registrationFileUrl = _Undefined,
+    Object? degreeFileUrl = _Undefined,
+    Object? idFileUrl = _Undefined,
     bool? isTermsAccepted,
     _i2.DentistStatus? status,
   }) {
@@ -249,14 +306,25 @@ class _DentistImpl extends Dentist {
       email: email ?? this.email,
       phone: phone ?? this.phone,
       passwordHash: passwordHash ?? this.passwordHash,
+      dateOfBirth: dateOfBirth is String? ? dateOfBirth : this.dateOfBirth,
       licenseNumber: licenseNumber ?? this.licenseNumber,
       specialization: specialization ?? this.specialization,
+      qualification: qualification is String?
+          ? qualification
+          : this.qualification,
       experience: experience ?? this.experience,
       clinicName: clinicName ?? this.clinicName,
       clinicAddress: clinicAddress ?? this.clinicAddress,
       profilePhotoUrl: profilePhotoUrl is String?
           ? profilePhotoUrl
           : this.profilePhotoUrl,
+      registrationFileUrl: registrationFileUrl is String?
+          ? registrationFileUrl
+          : this.registrationFileUrl,
+      degreeFileUrl: degreeFileUrl is String?
+          ? degreeFileUrl
+          : this.degreeFileUrl,
+      idFileUrl: idFileUrl is String? ? idFileUrl : this.idFileUrl,
       isTermsAccepted: isTermsAccepted ?? this.isTermsAccepted,
       status: status ?? this.status,
     );
@@ -286,6 +354,11 @@ class DentistUpdateTable extends _i1.UpdateTable<DentistTable> {
     value,
   );
 
+  _i1.ColumnValue<String, String> dateOfBirth(String? value) => _i1.ColumnValue(
+    table.dateOfBirth,
+    value,
+  );
+
   _i1.ColumnValue<String, String> licenseNumber(String value) =>
       _i1.ColumnValue(
         table.licenseNumber,
@@ -295,6 +368,12 @@ class DentistUpdateTable extends _i1.UpdateTable<DentistTable> {
   _i1.ColumnValue<String, String> specialization(String value) =>
       _i1.ColumnValue(
         table.specialization,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> qualification(String? value) =>
+      _i1.ColumnValue(
+        table.qualification,
         value,
       );
 
@@ -319,6 +398,23 @@ class DentistUpdateTable extends _i1.UpdateTable<DentistTable> {
         table.profilePhotoUrl,
         value,
       );
+
+  _i1.ColumnValue<String, String> registrationFileUrl(String? value) =>
+      _i1.ColumnValue(
+        table.registrationFileUrl,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> degreeFileUrl(String? value) =>
+      _i1.ColumnValue(
+        table.degreeFileUrl,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> idFileUrl(String? value) => _i1.ColumnValue(
+    table.idFileUrl,
+    value,
+  );
 
   _i1.ColumnValue<bool, bool> isTermsAccepted(bool value) => _i1.ColumnValue(
     table.isTermsAccepted,
@@ -352,12 +448,20 @@ class DentistTable extends _i1.Table<int?> {
       'passwordHash',
       this,
     );
+    dateOfBirth = _i1.ColumnString(
+      'dateOfBirth',
+      this,
+    );
     licenseNumber = _i1.ColumnString(
       'licenseNumber',
       this,
     );
     specialization = _i1.ColumnString(
       'specialization',
+      this,
+    );
+    qualification = _i1.ColumnString(
+      'qualification',
       this,
     );
     experience = _i1.ColumnInt(
@@ -374,6 +478,18 @@ class DentistTable extends _i1.Table<int?> {
     );
     profilePhotoUrl = _i1.ColumnString(
       'profilePhotoUrl',
+      this,
+    );
+    registrationFileUrl = _i1.ColumnString(
+      'registrationFileUrl',
+      this,
+    );
+    degreeFileUrl = _i1.ColumnString(
+      'degreeFileUrl',
+      this,
+    );
+    idFileUrl = _i1.ColumnString(
+      'idFileUrl',
       this,
     );
     isTermsAccepted = _i1.ColumnBool(
@@ -397,9 +513,13 @@ class DentistTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString passwordHash;
 
+  late final _i1.ColumnString dateOfBirth;
+
   late final _i1.ColumnString licenseNumber;
 
   late final _i1.ColumnString specialization;
+
+  late final _i1.ColumnString qualification;
 
   late final _i1.ColumnInt experience;
 
@@ -408,6 +528,12 @@ class DentistTable extends _i1.Table<int?> {
   late final _i1.ColumnString clinicAddress;
 
   late final _i1.ColumnString profilePhotoUrl;
+
+  late final _i1.ColumnString registrationFileUrl;
+
+  late final _i1.ColumnString degreeFileUrl;
+
+  late final _i1.ColumnString idFileUrl;
 
   late final _i1.ColumnBool isTermsAccepted;
 
@@ -420,12 +546,17 @@ class DentistTable extends _i1.Table<int?> {
     email,
     phone,
     passwordHash,
+    dateOfBirth,
     licenseNumber,
     specialization,
+    qualification,
     experience,
     clinicName,
     clinicAddress,
     profilePhotoUrl,
+    registrationFileUrl,
+    degreeFileUrl,
+    idFileUrl,
     isTermsAccepted,
     status,
   ];
