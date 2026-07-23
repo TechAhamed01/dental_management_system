@@ -15,7 +15,9 @@ import 'package:serverpod/serverpod.dart' as _i1;
 enum DentistStatus implements _i1.SerializableModel {
   pending,
   approved,
-  rejected;
+  rejected,
+  suspended,
+  terminated;
 
   static DentistStatus fromJson(String name) {
     switch (name) {
@@ -25,6 +27,10 @@ enum DentistStatus implements _i1.SerializableModel {
         return DentistStatus.approved;
       case 'rejected':
         return DentistStatus.rejected;
+      case 'suspended':
+        return DentistStatus.suspended;
+      case 'terminated':
+        return DentistStatus.terminated;
       default:
         throw ArgumentError(
           'Value "$name" cannot be converted to "DentistStatus"',

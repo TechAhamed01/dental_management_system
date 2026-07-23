@@ -20,6 +20,8 @@ abstract class DashboardStats
     required this.pendingDoctors,
     required this.approvedDoctors,
     required this.rejectedDoctors,
+    required this.suspendedDoctors,
+    required this.terminatedDoctors,
   });
 
   factory DashboardStats({
@@ -28,6 +30,8 @@ abstract class DashboardStats
     required int pendingDoctors,
     required int approvedDoctors,
     required int rejectedDoctors,
+    required int suspendedDoctors,
+    required int terminatedDoctors,
   }) = _DashboardStatsImpl;
 
   factory DashboardStats.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -37,6 +41,8 @@ abstract class DashboardStats
       pendingDoctors: jsonSerialization['pendingDoctors'] as int,
       approvedDoctors: jsonSerialization['approvedDoctors'] as int,
       rejectedDoctors: jsonSerialization['rejectedDoctors'] as int,
+      suspendedDoctors: jsonSerialization['suspendedDoctors'] as int,
+      terminatedDoctors: jsonSerialization['terminatedDoctors'] as int,
     );
   }
 
@@ -50,6 +56,10 @@ abstract class DashboardStats
 
   int rejectedDoctors;
 
+  int suspendedDoctors;
+
+  int terminatedDoctors;
+
   /// Returns a shallow copy of this [DashboardStats]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -59,6 +69,8 @@ abstract class DashboardStats
     int? pendingDoctors,
     int? approvedDoctors,
     int? rejectedDoctors,
+    int? suspendedDoctors,
+    int? terminatedDoctors,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -69,6 +81,8 @@ abstract class DashboardStats
       'pendingDoctors': pendingDoctors,
       'approvedDoctors': approvedDoctors,
       'rejectedDoctors': rejectedDoctors,
+      'suspendedDoctors': suspendedDoctors,
+      'terminatedDoctors': terminatedDoctors,
     };
   }
 
@@ -81,6 +95,8 @@ abstract class DashboardStats
       'pendingDoctors': pendingDoctors,
       'approvedDoctors': approvedDoctors,
       'rejectedDoctors': rejectedDoctors,
+      'suspendedDoctors': suspendedDoctors,
+      'terminatedDoctors': terminatedDoctors,
     };
   }
 
@@ -97,12 +113,16 @@ class _DashboardStatsImpl extends DashboardStats {
     required int pendingDoctors,
     required int approvedDoctors,
     required int rejectedDoctors,
+    required int suspendedDoctors,
+    required int terminatedDoctors,
   }) : super._(
          totalPatients: totalPatients,
          totalDoctors: totalDoctors,
          pendingDoctors: pendingDoctors,
          approvedDoctors: approvedDoctors,
          rejectedDoctors: rejectedDoctors,
+         suspendedDoctors: suspendedDoctors,
+         terminatedDoctors: terminatedDoctors,
        );
 
   /// Returns a shallow copy of this [DashboardStats]
@@ -115,6 +135,8 @@ class _DashboardStatsImpl extends DashboardStats {
     int? pendingDoctors,
     int? approvedDoctors,
     int? rejectedDoctors,
+    int? suspendedDoctors,
+    int? terminatedDoctors,
   }) {
     return DashboardStats(
       totalPatients: totalPatients ?? this.totalPatients,
@@ -122,6 +144,8 @@ class _DashboardStatsImpl extends DashboardStats {
       pendingDoctors: pendingDoctors ?? this.pendingDoctors,
       approvedDoctors: approvedDoctors ?? this.approvedDoctors,
       rejectedDoctors: rejectedDoctors ?? this.rejectedDoctors,
+      suspendedDoctors: suspendedDoctors ?? this.suspendedDoctors,
+      terminatedDoctors: terminatedDoctors ?? this.terminatedDoctors,
     );
   }
 }

@@ -16,6 +16,7 @@ import '../auth/dentist_status.dart' as _i2;
 abstract class Dentist implements _i1.SerializableModel {
   Dentist._({
     this.id,
+    this.dentistCode,
     required this.fullName,
     required this.email,
     required this.phone,
@@ -33,10 +34,18 @@ abstract class Dentist implements _i1.SerializableModel {
     this.idFileUrl,
     required this.isTermsAccepted,
     required this.status,
+    this.suspendedAt,
+    this.suspensionEndsAt,
+    this.suspensionReason,
+    this.suspendedBy,
+    this.terminatedAt,
+    this.terminationReason,
+    this.terminatedBy,
   });
 
   factory Dentist({
     int? id,
+    String? dentistCode,
     required String fullName,
     required String email,
     required String phone,
@@ -54,11 +63,19 @@ abstract class Dentist implements _i1.SerializableModel {
     String? idFileUrl,
     required bool isTermsAccepted,
     required _i2.DentistStatus status,
+    DateTime? suspendedAt,
+    DateTime? suspensionEndsAt,
+    String? suspensionReason,
+    String? suspendedBy,
+    DateTime? terminatedAt,
+    String? terminationReason,
+    String? terminatedBy,
   }) = _DentistImpl;
 
   factory Dentist.fromJson(Map<String, dynamic> jsonSerialization) {
     return Dentist(
       id: jsonSerialization['id'] as int?,
+      dentistCode: jsonSerialization['dentistCode'] as String?,
       fullName: jsonSerialization['fullName'] as String,
       email: jsonSerialization['email'] as String,
       phone: jsonSerialization['phone'] as String,
@@ -80,6 +97,25 @@ abstract class Dentist implements _i1.SerializableModel {
       status: _i2.DentistStatus.fromJson(
         (jsonSerialization['status'] as String),
       ),
+      suspendedAt: jsonSerialization['suspendedAt'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(
+              jsonSerialization['suspendedAt'],
+            ),
+      suspensionEndsAt: jsonSerialization['suspensionEndsAt'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(
+              jsonSerialization['suspensionEndsAt'],
+            ),
+      suspensionReason: jsonSerialization['suspensionReason'] as String?,
+      suspendedBy: jsonSerialization['suspendedBy'] as String?,
+      terminatedAt: jsonSerialization['terminatedAt'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(
+              jsonSerialization['terminatedAt'],
+            ),
+      terminationReason: jsonSerialization['terminationReason'] as String?,
+      terminatedBy: jsonSerialization['terminatedBy'] as String?,
     );
   }
 
@@ -87,6 +123,8 @@ abstract class Dentist implements _i1.SerializableModel {
   /// database or if it has been fetched from the database. Otherwise,
   /// the id will be null.
   int? id;
+
+  String? dentistCode;
 
   String fullName;
 
@@ -122,11 +160,26 @@ abstract class Dentist implements _i1.SerializableModel {
 
   _i2.DentistStatus status;
 
+  DateTime? suspendedAt;
+
+  DateTime? suspensionEndsAt;
+
+  String? suspensionReason;
+
+  String? suspendedBy;
+
+  DateTime? terminatedAt;
+
+  String? terminationReason;
+
+  String? terminatedBy;
+
   /// Returns a shallow copy of this [Dentist]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   Dentist copyWith({
     int? id,
+    String? dentistCode,
     String? fullName,
     String? email,
     String? phone,
@@ -144,12 +197,20 @@ abstract class Dentist implements _i1.SerializableModel {
     String? idFileUrl,
     bool? isTermsAccepted,
     _i2.DentistStatus? status,
+    DateTime? suspendedAt,
+    DateTime? suspensionEndsAt,
+    String? suspensionReason,
+    String? suspendedBy,
+    DateTime? terminatedAt,
+    String? terminationReason,
+    String? terminatedBy,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       '__className__': 'Dentist',
       if (id != null) 'id': id,
+      if (dentistCode != null) 'dentistCode': dentistCode,
       'fullName': fullName,
       'email': email,
       'phone': phone,
@@ -168,6 +229,14 @@ abstract class Dentist implements _i1.SerializableModel {
       if (idFileUrl != null) 'idFileUrl': idFileUrl,
       'isTermsAccepted': isTermsAccepted,
       'status': status.toJson(),
+      if (suspendedAt != null) 'suspendedAt': suspendedAt?.toJson(),
+      if (suspensionEndsAt != null)
+        'suspensionEndsAt': suspensionEndsAt?.toJson(),
+      if (suspensionReason != null) 'suspensionReason': suspensionReason,
+      if (suspendedBy != null) 'suspendedBy': suspendedBy,
+      if (terminatedAt != null) 'terminatedAt': terminatedAt?.toJson(),
+      if (terminationReason != null) 'terminationReason': terminationReason,
+      if (terminatedBy != null) 'terminatedBy': terminatedBy,
     };
   }
 
@@ -182,6 +251,7 @@ class _Undefined {}
 class _DentistImpl extends Dentist {
   _DentistImpl({
     int? id,
+    String? dentistCode,
     required String fullName,
     required String email,
     required String phone,
@@ -199,8 +269,16 @@ class _DentistImpl extends Dentist {
     String? idFileUrl,
     required bool isTermsAccepted,
     required _i2.DentistStatus status,
+    DateTime? suspendedAt,
+    DateTime? suspensionEndsAt,
+    String? suspensionReason,
+    String? suspendedBy,
+    DateTime? terminatedAt,
+    String? terminationReason,
+    String? terminatedBy,
   }) : super._(
          id: id,
+         dentistCode: dentistCode,
          fullName: fullName,
          email: email,
          phone: phone,
@@ -218,6 +296,13 @@ class _DentistImpl extends Dentist {
          idFileUrl: idFileUrl,
          isTermsAccepted: isTermsAccepted,
          status: status,
+         suspendedAt: suspendedAt,
+         suspensionEndsAt: suspensionEndsAt,
+         suspensionReason: suspensionReason,
+         suspendedBy: suspendedBy,
+         terminatedAt: terminatedAt,
+         terminationReason: terminationReason,
+         terminatedBy: terminatedBy,
        );
 
   /// Returns a shallow copy of this [Dentist]
@@ -226,6 +311,7 @@ class _DentistImpl extends Dentist {
   @override
   Dentist copyWith({
     Object? id = _Undefined,
+    Object? dentistCode = _Undefined,
     String? fullName,
     String? email,
     String? phone,
@@ -243,9 +329,17 @@ class _DentistImpl extends Dentist {
     Object? idFileUrl = _Undefined,
     bool? isTermsAccepted,
     _i2.DentistStatus? status,
+    Object? suspendedAt = _Undefined,
+    Object? suspensionEndsAt = _Undefined,
+    Object? suspensionReason = _Undefined,
+    Object? suspendedBy = _Undefined,
+    Object? terminatedAt = _Undefined,
+    Object? terminationReason = _Undefined,
+    Object? terminatedBy = _Undefined,
   }) {
     return Dentist(
       id: id is int? ? id : this.id,
+      dentistCode: dentistCode is String? ? dentistCode : this.dentistCode,
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
       phone: phone ?? this.phone,
@@ -271,6 +365,21 @@ class _DentistImpl extends Dentist {
       idFileUrl: idFileUrl is String? ? idFileUrl : this.idFileUrl,
       isTermsAccepted: isTermsAccepted ?? this.isTermsAccepted,
       status: status ?? this.status,
+      suspendedAt: suspendedAt is DateTime? ? suspendedAt : this.suspendedAt,
+      suspensionEndsAt: suspensionEndsAt is DateTime?
+          ? suspensionEndsAt
+          : this.suspensionEndsAt,
+      suspensionReason: suspensionReason is String?
+          ? suspensionReason
+          : this.suspensionReason,
+      suspendedBy: suspendedBy is String? ? suspendedBy : this.suspendedBy,
+      terminatedAt: terminatedAt is DateTime?
+          ? terminatedAt
+          : this.terminatedAt,
+      terminationReason: terminationReason is String?
+          ? terminationReason
+          : this.terminationReason,
+      terminatedBy: terminatedBy is String? ? terminatedBy : this.terminatedBy,
     );
   }
 }

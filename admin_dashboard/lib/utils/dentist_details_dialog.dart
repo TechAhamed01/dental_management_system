@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:dental_client/dental_client.dart';
 import '../providers/dashboard_provider.dart';
 import 'theme.dart';
+import 'dentist_pdf_generator.dart';
 
 void showDentistDetailsDialog(
   BuildContext context,
@@ -41,7 +42,7 @@ void showDentistDetailsDialog(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Dr. ${dentist.fullName}',
+                            'Dr. ${dentist.fullName} ${dentist.dentistCode != null ? '(${dentist.dentistCode})' : ''}',
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
@@ -59,6 +60,22 @@ void showDentistDetailsDialog(
                   ),
                   Row(
                     children: [
+                      ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
+                          foregroundColor: AppTheme.primaryColor,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        icon: const Icon(Icons.picture_as_pdf, size: 18),
+                        label: const Text(
+                          'Download PDF',
+                          style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                        ),
+                        onPressed: () => generateAndDownloadDentistPdf(context, dentist),
+                      ),
+                      const SizedBox(width: 12),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
@@ -147,6 +164,42 @@ void showDentistDetailsDialog(
                       const SizedBox(height: 16),
                       _buildDocumentCard(context, 'Government ID', dentist.idFileUrl),
                       const SizedBox(height: 24),
+                      if (dentist.status == DentistStatus.suspended) ...[
+                        _buildSectionHeading('Suspension Details'),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(color: Colors.orange.shade50, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.orange.shade200)),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Suspended Until: ${dentist.suspensionEndsAt?.toString().split(' ')[0] ?? 'N/A'}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.deepOrange)),
+                              const SizedBox(height: 8),
+                              Text('Reason: ${dentist.suspensionReason ?? 'N/A'}'),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+                      if (dentist.status == DentistStatus.terminated) ...[
+                        _buildSectionHeading('Termination Details'),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.red.shade200)),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Terminated On: ${dentist.terminatedAt?.toString().split(' ')[0] ?? 'N/A'}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                              const SizedBox(height: 8),
+                              Text('Reason: ${dentist.terminationReason ?? 'N/A'}'),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                      ],
+                      _buildAuditLogsSection(dentist.id!, provider),
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -157,11 +210,22 @@ void showDentistDetailsDialog(
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppTheme.primaryColor,
+                      side: const BorderSide(color: AppTheme.primaryColor),
+                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                    ),
+                    icon: const Icon(Icons.download_rounded, size: 18),
+                    label: const Text('Download Complete Details (PDF)'),
+                    onPressed: () => generateAndDownloadDentistPdf(context, dentist),
+                  ),
+                  const SizedBox(width: 16),
                   TextButton(
                     onPressed: () => Navigator.pop(ctx),
                     child: const Text('Close'),
                   ),
-                  if (!readOnly && dentist.status == DentistStatus.pending) ...[
+                  if (dentist.status == DentistStatus.pending) ...[
                     const SizedBox(width: 16),
                     OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
@@ -170,7 +234,7 @@ void showDentistDetailsDialog(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                       ),
                       icon: const Icon(Icons.close, size: 18),
-                      label: const Text('Reject Application'),
+                      label: const Text('Reject'),
                       onPressed: () {
                         Navigator.pop(ctx);
                         _showConfirmationDialog(context, 'Reject', dentist, () {
@@ -185,12 +249,36 @@ void showDentistDetailsDialog(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                       ),
                       icon: const Icon(Icons.check, size: 18),
-                      label: const Text('Approve Application'),
+                      label: const Text('Approve'),
                       onPressed: () {
                         Navigator.pop(ctx);
                         _showConfirmationDialog(context, 'Approve', dentist, () {
                           provider.approveDentist(dentist.id!);
                         });
+                      },
+                    ),
+                  ],
+                  if (dentist.status == DentistStatus.approved || dentist.status == DentistStatus.suspended) ...[
+                    if (dentist.status != DentistStatus.suspended) ...[
+                      const SizedBox(width: 16),
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(foregroundColor: Colors.orange, side: const BorderSide(color: Colors.orange)),
+                        icon: const Icon(Icons.pause_circle_outline, size: 18),
+                        label: const Text('Suspend'),
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          _showSuspendDialog(context, dentist, provider);
+                        },
+                      ),
+                    ],
+                    const SizedBox(width: 16),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF991B1B), foregroundColor: Colors.white),
+                      icon: const Icon(Icons.block, size: 18),
+                      label: const Text('Terminate'),
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        _showTerminateDialog(context, dentist, provider);
                       },
                     ),
                   ],
@@ -212,6 +300,10 @@ Color _getStatusColor(DentistStatus status) {
       return AppTheme.errorColor;
     case DentistStatus.pending:
       return Colors.amber.shade800;
+    case DentistStatus.suspended:
+      return Colors.orange;
+    case DentistStatus.terminated:
+      return const Color(0xFF991B1B);
   }
 }
 
@@ -333,12 +425,48 @@ Widget _buildDocumentCard(BuildContext context, String title, String? rawData) {
       } catch (e) {
         debugPrint('Error decoding pdf bytes: $e');
       }
+    } else {
+      try {
+        final base64Part = dataUrl.split(',').last;
+        final decoded = base64Decode(base64Part);
+        if (decoded.length >= 4 &&
+            decoded[0] == 0x25 &&
+            decoded[1] == 0x50 &&
+            decoded[2] == 0x44 &&
+            decoded[3] == 0x46) {
+          isPdf = true;
+          pdfBytes = decoded;
+        } else {
+          imageBytes = decoded;
+        }
+      } catch (e) {
+        debugPrint('Error decoding fallback dataUrl: $e');
+      }
     }
-  } else if (fileName.toLowerCase().endsWith('.png') ||
-      fileName.toLowerCase().endsWith('.jpg') ||
-      fileName.toLowerCase().endsWith('.jpeg')) {
-  } else if (fileName.toLowerCase().endsWith('.pdf')) {
-    isPdf = true;
+  } else {
+    if (fileName.toLowerCase().endsWith('.pdf')) {
+      isPdf = true;
+    } else if (!fileName.toLowerCase().endsWith('.png') &&
+        !fileName.toLowerCase().endsWith('.jpg') &&
+        !fileName.toLowerCase().endsWith('.jpeg')) {
+      try {
+        final decoded = base64Decode(fileName);
+        if (decoded.length >= 4 &&
+            decoded[0] == 0x25 &&
+            decoded[1] == 0x50 &&
+            decoded[2] == 0x44 &&
+            decoded[3] == 0x46) {
+          isPdf = true;
+          pdfBytes = decoded;
+          fileName = '$title File.pdf';
+        } else if (decoded.length >= 4) {
+          imageBytes = decoded;
+          fileName = '$title File.png';
+        }
+      } catch (e) {
+        // Not raw base64, just a normal filename path
+      }
+    }
   }
 
   return Container(
@@ -539,7 +667,10 @@ void _showFullscreenPdf(
   String url = '';
   if (pdfBytes != null) {
     try {
-      final blob = html.Blob([pdfBytes], 'application/pdf');
+      final Uint8List uint8Bytes = pdfBytes is Uint8List
+          ? pdfBytes
+          : Uint8List.fromList(pdfBytes);
+      final blob = html.Blob([uint8Bytes], 'application/pdf');
       url = html.Url.createObjectUrlFromBlob(blob);
     } catch (e) {
       debugPrint('Error creating Blob URL: $e');
@@ -623,7 +754,7 @@ void _showFullscreenPdf(
                   icon: const Icon(Icons.download, size: 18),
                   label: const Text('Download'),
                   onPressed: () {
-                    final anchor = html.AnchorElement(href: url)
+                    html.AnchorElement(href: url)
                       ..setAttribute('download', fileName)
                       ..click();
                   },
@@ -655,5 +786,149 @@ void _showFullscreenPdf(
         ),
       ),
     ),
+  );
+}
+
+Widget _buildAuditLogsSection(int dentistId, DashboardProvider provider) {
+  return FutureBuilder<List<AuditLog>>(
+    future: provider.fetchDentistAuditLogs(dentistId),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      }
+      final logs = snapshot.data ?? [];
+      if (logs.isEmpty) return const SizedBox();
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeading('Audit History Timeline'),
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: logs.length,
+              separatorBuilder: (c, i) => const Divider(),
+              itemBuilder: (c, i) {
+                final log = logs[i];
+                return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: const Icon(Icons.history, color: AppTheme.primaryColor),
+                  title: Text(log.action, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(log.reason ?? ''),
+                  trailing: Text(log.timestamp.toString().split('.')[0], style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                );
+              },
+            ),
+          )
+        ],
+      );
+    }
+  );
+}
+
+void _showSuspendDialog(BuildContext context, Dentist dentist, DashboardProvider provider) {
+  int durationMonths = 1;
+  final reasonController = TextEditingController();
+  showDialog(
+    context: context,
+    builder: (ctx) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text('Suspend Dentist'),
+            content: SizedBox(
+              width: 400,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  DropdownButtonFormField<int>(
+                    value: durationMonths,
+                    decoration: const InputDecoration(labelText: 'Suspension Duration', border: OutlineInputBorder()),
+                    items: const [
+                      DropdownMenuItem(value: 1, child: Text('1 Month')),
+                      DropdownMenuItem(value: 2, child: Text('2 Months')),
+                      DropdownMenuItem(value: 3, child: Text('3 Months')),
+                      DropdownMenuItem(value: 6, child: Text('6 Months')),
+                    ],
+                    onChanged: (val) => setState(() => durationMonths = val ?? 1),
+                  ),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: reasonController,
+                    decoration: const InputDecoration(labelText: 'Reason for Suspension', border: OutlineInputBorder()),
+                    maxLines: 3,
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                onPressed: () async {
+                  if (reasonController.text.trim().isEmpty) return;
+                  final endsAt = DateTime.now().add(Duration(days: 30 * durationMonths));
+                  final success = await provider.suspendDentist(dentist.id!, endsAt, reasonController.text);
+                  Navigator.pop(ctx);
+                  if (!success && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to suspend')));
+                  }
+                },
+                child: const Text('Suspend'),
+              ),
+            ],
+          );
+        }
+      );
+    }
+  );
+}
+
+void _showTerminateDialog(BuildContext context, Dentist dentist, DashboardProvider provider) {
+  final reasonController = TextEditingController();
+  showDialog(
+    context: context,
+    builder: (ctx) {
+      return AlertDialog(
+        title: const Text('Terminate Dentist'),
+        content: SizedBox(
+          width: 400,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('This action is permanent and will prevent the dentist from ever logging in again.', style: TextStyle(color: Colors.red)),
+              const SizedBox(height: 16),
+              TextField(
+                controller: reasonController,
+                decoration: const InputDecoration(labelText: 'Reason for Termination (Required)', border: OutlineInputBorder()),
+                maxLines: 3,
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            onPressed: () async {
+              if (reasonController.text.trim().isEmpty) return;
+              final success = await provider.terminateDentist(dentist.id!, reasonController.text);
+              Navigator.pop(ctx);
+              if (!success && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to terminate')));
+              }
+            },
+            child: const Text('Terminate Permanently'),
+          ),
+        ],
+      );
+    }
   );
 }

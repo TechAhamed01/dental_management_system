@@ -3,3 +3,5 @@ values:
   - pending
   - approved
   - rejected
+  - suspended
+  - terminated

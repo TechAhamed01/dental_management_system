@@ -19,9 +19,10 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
 import 'package:dental_server/src/generated/auth/auth_response.dart' as _i5;
 import 'package:dental_server/src/generated/auth/dentist.dart' as _i6;
 import 'package:dental_server/src/generated/auth/admin.dart' as _i7;
-import 'package:dental_server/src/generated/auth/dashboard_stats.dart' as _i8;
-import 'package:dental_server/src/generated/auth/patient.dart' as _i9;
-import 'package:dental_server/src/generated/greetings/greeting.dart' as _i10;
+import 'package:dental_server/src/generated/auth/audit_log.dart' as _i8;
+import 'package:dental_server/src/generated/auth/dashboard_stats.dart' as _i9;
+import 'package:dental_server/src/generated/auth/patient.dart' as _i10;
+import 'package:dental_server/src/generated/greetings/greeting.dart' as _i11;
 import 'package:dental_server/src/generated/protocol.dart';
 import 'package:dental_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -800,8 +801,9 @@ class _AuthEndpoint {
 
   _i3.Future<_i6.Dentist> approveDentist(
     _i1.TestSessionBuilder sessionBuilder,
-    int dentistId,
-  ) async {
+    int dentistId, {
+    required String adminEmail,
+  }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
@@ -813,7 +815,10 @@ class _AuthEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'auth',
           methodName: 'approveDentist',
-          parameters: _i1.testObjectToJson({'dentistId': dentistId}),
+          parameters: _i1.testObjectToJson({
+            'dentistId': dentistId,
+            'adminEmail': adminEmail,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -831,8 +836,10 @@ class _AuthEndpoint {
 
   _i3.Future<_i6.Dentist> rejectDentist(
     _i1.TestSessionBuilder sessionBuilder,
-    int dentistId,
-  ) async {
+    int dentistId, {
+    required String adminEmail,
+    String? reason,
+  }) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
@@ -844,7 +851,11 @@ class _AuthEndpoint {
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'auth',
           methodName: 'rejectDentist',
-          parameters: _i1.testObjectToJson({'dentistId': dentistId}),
+          parameters: _i1.testObjectToJson({
+            'dentistId': dentistId,
+            'adminEmail': adminEmail,
+            'reason': reason,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =
@@ -860,7 +871,180 @@ class _AuthEndpoint {
     });
   }
 
-  _i3.Future<_i8.DashboardStats> getDashboardStats(
+  _i3.Future<_i6.Dentist> suspendDentist(
+    _i1.TestSessionBuilder sessionBuilder,
+    int dentistId,
+    DateTime endsAt,
+    String reason, {
+    required String adminEmail,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'auth',
+            method: 'suspendDentist',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'auth',
+          methodName: 'suspendDentist',
+          parameters: _i1.testObjectToJson({
+            'dentistId': dentistId,
+            'endsAt': endsAt,
+            'reason': reason,
+            'adminEmail': adminEmail,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i6.Dentist>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i6.Dentist> terminateDentist(
+    _i1.TestSessionBuilder sessionBuilder,
+    int dentistId,
+    String reason, {
+    required String adminEmail,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'auth',
+            method: 'terminateDentist',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'auth',
+          methodName: 'terminateDentist',
+          parameters: _i1.testObjectToJson({
+            'dentistId': dentistId,
+            'reason': reason,
+            'adminEmail': adminEmail,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i6.Dentist>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i8.AuditLog>> getDentistAuditLogs(
+    _i1.TestSessionBuilder sessionBuilder,
+    int dentistId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'auth',
+            method: 'getDentistAuditLogs',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'auth',
+          methodName: 'getDentistAuditLogs',
+          parameters: _i1.testObjectToJson({'dentistId': dentistId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i8.AuditLog>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<void> logPdfDownload(
+    _i1.TestSessionBuilder sessionBuilder,
+    int dentistId, {
+    required String adminEmail,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'auth',
+            method: 'logPdfDownload',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'auth',
+          methodName: 'logPdfDownload',
+          parameters: _i1.testObjectToJson({
+            'dentistId': dentistId,
+            'adminEmail': adminEmail,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<void>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i6.Dentist?> searchDentistByCode(
+    _i1.TestSessionBuilder sessionBuilder,
+    String code,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'auth',
+            method: 'searchDentistByCode',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'auth',
+          methodName: 'searchDentistByCode',
+          parameters: _i1.testObjectToJson({'code': code}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i6.Dentist?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i9.DashboardStats> getDashboardStats(
     _i1.TestSessionBuilder sessionBuilder,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -882,7 +1066,7 @@ class _AuthEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i8.DashboardStats>);
+                as _i3.Future<_i9.DashboardStats>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -890,7 +1074,7 @@ class _AuthEndpoint {
     });
   }
 
-  _i3.Future<List<_i9.Patient>> getAllPatients(
+  _i3.Future<List<_i10.Patient>> getAllPatients(
     _i1.TestSessionBuilder sessionBuilder,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -912,7 +1096,7 @@ class _AuthEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i9.Patient>>);
+                as _i3.Future<List<_i10.Patient>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1009,6 +1193,66 @@ class _AuthEndpoint {
       }
     });
   }
+
+  _i3.Future<List<_i6.Dentist>> getSuspendedDentists(
+    _i1.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'auth',
+            method: 'getSuspendedDentists',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'auth',
+          methodName: 'getSuspendedDentists',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i6.Dentist>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i6.Dentist>> getTerminatedDentists(
+    _i1.TestSessionBuilder sessionBuilder,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'auth',
+            method: 'getTerminatedDentists',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'auth',
+          methodName: 'getTerminatedDentists',
+          parameters: _i1.testObjectToJson({}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i6.Dentist>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
 }
 
 class _GreetingEndpoint {
@@ -1021,7 +1265,7 @@ class _GreetingEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i10.Greeting> hello(
+  _i3.Future<_i11.Greeting> hello(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
   ) async {
@@ -1044,7 +1288,7 @@ class _GreetingEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i10.Greeting>);
+                as _i3.Future<_i11.Greeting>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

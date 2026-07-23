@@ -73,10 +73,34 @@ class _DoctorLoginState extends State<DoctorLogin> {
       }
     } else {
       final errorMsg = controller.errorMessage ?? 'Login failed. Please check your credentials.';
-      debugPrint("[DoctorLogin] Login returned null/error -> Showing SnackBar: $errorMsg");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMsg)),
-      );
+      debugPrint("[DoctorLogin] Login returned null/error -> $errorMsg");
+      
+      if (errorMsg.toLowerCase().contains('suspended') || errorMsg.toLowerCase().contains('terminated')) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Row(
+              children: [
+                Icon(
+                  errorMsg.toLowerCase().contains('terminated') ? Icons.block : Icons.pause_circle_outline,
+                  color: Colors.red,
+                ),
+                const SizedBox(width: 8),
+                Text(errorMsg.toLowerCase().contains('terminated') ? 'Account Terminated' : 'Account Suspended'),
+              ],
+            ),
+            content: Text(errorMsg, style: const TextStyle(fontSize: 15)),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold))),
+            ],
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMsg)),
+        );
+      }
     }
   }
 

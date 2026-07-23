@@ -19,10 +19,11 @@ import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
 import 'package:dental_client/src/protocol/auth/auth_response.dart' as _i5;
 import 'package:dental_client/src/protocol/auth/dentist.dart' as _i6;
 import 'package:dental_client/src/protocol/auth/admin.dart' as _i7;
-import 'package:dental_client/src/protocol/auth/dashboard_stats.dart' as _i8;
-import 'package:dental_client/src/protocol/auth/patient.dart' as _i9;
-import 'package:dental_client/src/protocol/greetings/greeting.dart' as _i10;
-import 'protocol.dart' as _i11;
+import 'package:dental_client/src/protocol/auth/audit_log.dart' as _i8;
+import 'package:dental_client/src/protocol/auth/dashboard_stats.dart' as _i9;
+import 'package:dental_client/src/protocol/auth/patient.dart' as _i10;
+import 'package:dental_client/src/protocol/greetings/greeting.dart' as _i11;
+import 'protocol.dart' as _i12;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -365,29 +366,97 @@ class EndpointAuth extends _i2.EndpointRef {
         {},
       );
 
-  _i3.Future<_i6.Dentist> approveDentist(int dentistId) =>
-      caller.callServerEndpoint<_i6.Dentist>(
+  _i3.Future<_i6.Dentist> approveDentist(
+    int dentistId, {
+    required String adminEmail,
+  }) => caller.callServerEndpoint<_i6.Dentist>(
+    'auth',
+    'approveDentist',
+    {
+      'dentistId': dentistId,
+      'adminEmail': adminEmail,
+    },
+  );
+
+  _i3.Future<_i6.Dentist> rejectDentist(
+    int dentistId, {
+    required String adminEmail,
+    String? reason,
+  }) => caller.callServerEndpoint<_i6.Dentist>(
+    'auth',
+    'rejectDentist',
+    {
+      'dentistId': dentistId,
+      'adminEmail': adminEmail,
+      'reason': reason,
+    },
+  );
+
+  _i3.Future<_i6.Dentist> suspendDentist(
+    int dentistId,
+    DateTime endsAt,
+    String reason, {
+    required String adminEmail,
+  }) => caller.callServerEndpoint<_i6.Dentist>(
+    'auth',
+    'suspendDentist',
+    {
+      'dentistId': dentistId,
+      'endsAt': endsAt,
+      'reason': reason,
+      'adminEmail': adminEmail,
+    },
+  );
+
+  _i3.Future<_i6.Dentist> terminateDentist(
+    int dentistId,
+    String reason, {
+    required String adminEmail,
+  }) => caller.callServerEndpoint<_i6.Dentist>(
+    'auth',
+    'terminateDentist',
+    {
+      'dentistId': dentistId,
+      'reason': reason,
+      'adminEmail': adminEmail,
+    },
+  );
+
+  _i3.Future<List<_i8.AuditLog>> getDentistAuditLogs(int dentistId) =>
+      caller.callServerEndpoint<List<_i8.AuditLog>>(
         'auth',
-        'approveDentist',
+        'getDentistAuditLogs',
         {'dentistId': dentistId},
       );
 
-  _i3.Future<_i6.Dentist> rejectDentist(int dentistId) =>
-      caller.callServerEndpoint<_i6.Dentist>(
+  _i3.Future<void> logPdfDownload(
+    int dentistId, {
+    required String adminEmail,
+  }) => caller.callServerEndpoint<void>(
+    'auth',
+    'logPdfDownload',
+    {
+      'dentistId': dentistId,
+      'adminEmail': adminEmail,
+    },
+  );
+
+  _i3.Future<_i6.Dentist?> searchDentistByCode(String code) =>
+      caller.callServerEndpoint<_i6.Dentist?>(
         'auth',
-        'rejectDentist',
-        {'dentistId': dentistId},
+        'searchDentistByCode',
+        {'code': code},
       );
 
-  _i3.Future<_i8.DashboardStats> getDashboardStats() =>
-      caller.callServerEndpoint<_i8.DashboardStats>(
+  _i3.Future<_i9.DashboardStats> getDashboardStats() =>
+      caller.callServerEndpoint<_i9.DashboardStats>(
         'auth',
         'getDashboardStats',
         {},
       );
 
-  _i3.Future<List<_i9.Patient>> getAllPatients() =>
-      caller.callServerEndpoint<List<_i9.Patient>>(
+  _i3.Future<List<_i10.Patient>> getAllPatients() =>
+      caller.callServerEndpoint<List<_i10.Patient>>(
         'auth',
         'getAllPatients',
         {},
@@ -413,6 +482,20 @@ class EndpointAuth extends _i2.EndpointRef {
         'getRejectedDentists',
         {},
       );
+
+  _i3.Future<List<_i6.Dentist>> getSuspendedDentists() =>
+      caller.callServerEndpoint<List<_i6.Dentist>>(
+        'auth',
+        'getSuspendedDentists',
+        {},
+      );
+
+  _i3.Future<List<_i6.Dentist>> getTerminatedDentists() =>
+      caller.callServerEndpoint<List<_i6.Dentist>>(
+        'auth',
+        'getTerminatedDentists',
+        {},
+      );
 }
 
 /// This is an example endpoint that returns a greeting message through
@@ -425,8 +508,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i10.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i10.Greeting>(
+  _i3.Future<_i11.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i11.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -464,7 +547,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i11.Protocol(),
+         _i12.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
