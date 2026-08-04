@@ -1,237 +1,340 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dental_client/dental_client.dart' as dc;
+
 import '../controllers/login_controller.dart';
-import '../utils/colors.dart';
-import '../utils/text_styles.dart';
 import 'doctor_login.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final dc.Dentist? dentist;
 
-  const HomeScreen({super.key, this.dentist});
+  const HomeScreen({
+    super.key,
+    this.dentist,
+  });
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+
+  int currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    final controller = Provider.of<LoginController>(context, listen: false);
-    final currentDentist = dentist ?? controller.currentDentist;
+
+    final controller =
+        Provider.of<LoginController>(context, listen: false);
+
+    final currentDentist =
+        widget.dentist ?? controller.currentDentist;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+
+      backgroundColor: const Color(0xffF6F8FC),
+
       appBar: AppBar(
+
         backgroundColor: Colors.transparent,
+
         elevation: 0,
-        title: Text(
-          "Doctor Dashboard",
-          style: TextStyle(
-            color: AppColors.heading,
-            fontWeight: FontWeight.bold,
+
+        leading: IconButton(
+
+          icon: const Icon(
+            Icons.menu,
+            color: Colors.black,
           ),
+
+          onPressed: () {},
+
         ),
+
         actions: [
+
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.black),
-            onPressed: () {
-              controller.logout();
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (_) => const DoctorLogin()),
-              );
-            },
-            tooltip: "Logout",
+
+            onPressed: () {},
+
+            icon: const Icon(
+
+              Icons.notifications_none,
+
+              color: Colors.black,
+
+              size: 28,
+
+            ),
+
           ),
+
+          PopupMenuButton(
+
+            icon: const CircleAvatar(
+
+              backgroundColor: Color(0xff4A90E2),
+
+              child: Icon(
+                Icons.person,
+                color: Colors.white,
+              ),
+
+            ),
+
+            itemBuilder: (context) => [
+
+              PopupMenuItem(
+
+                child: const Text("Logout"),
+
+                onTap: () {
+
+                  controller.logout();
+
+                  Navigator.pushReplacement(
+
+                    context,
+
+                    MaterialPageRoute(
+
+                      builder: (_) =>
+                          const DoctorLogin(),
+
+                    ),
+
+                  );
+
+                },
+
+              )
+
+            ],
+
+          ),
+
+          const SizedBox(width: 10),
+
         ],
+
       ),
+
       body: SafeArea(
+
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+
+          padding: const EdgeInsets.all(20),
+
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
+
             children: [
-              // Welcome Card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xff4A62FF), Color(0xff2B44EC)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xff4A62FF).withValues(alpha: 0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
+
+              Text(
+
+                "Hello, Dr. ${currentDentist?.fullName ?? "Doctor"} 👋",
+
+                style: const TextStyle(
+
+                  fontWeight: FontWeight.bold,
+
+                  fontSize: 28,
+
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+
+              ),
+
+              const SizedBox(height: 8),
+
+              const Text(
+
+                "Have a nice day.",
+
+                style: TextStyle(
+
+                  color: Colors.grey,
+
+                  fontSize: 16,
+
+                ),
+
+              ),
+
+              const SizedBox(height: 30),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Welcome Back, Dr. ${currentDentist?.fullName ?? 'Dentist'}",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Text(
-                            "Approved",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ),
-                      ],
+                    Expanded(
+                      child: _dashboardCard(
+                        title: "Today's\nPatients",
+                        value: "18",
+                        icon: Icons.people_alt_outlined,
+                        iconColor: const Color(0xff4F7DF3),
+                        iconBackground: const Color(0xffEAF2FF),
+                      ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "${currentDentist?.specialization ?? 'Specialist'} • ${currentDentist?.clinicName ?? 'Dental Clinic'} | Code: ${currentDentist?.dentistCode ?? '-'}",
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontSize: 14,
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: _dashboardCard(
+                        title: "Appointments",
+                        value: "12",
+                        icon: Icons.calendar_today_outlined,
+                        iconColor: Colors.green,
+                        iconBackground: const Color(0xffEAFBF1),
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: _dashboardCard(
+                        title: "Pending",
+                        value: "05",
+                        icon: Icons.schedule,
+                        iconColor: Colors.orange,
+                        iconBackground: const Color(0xffFFF4E5),
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 28),
 
-              const Text(
-                "Today's Overview",
-                style: AppTextStyles.heading,
-              ),
-              const SizedBox(height: 16),
+const SizedBox(height: 35),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatCard(
-                      title: "Appointments",
-                      count: "8",
-                      icon: Icons.calendar_today,
-                      color: const Color(0xff4A62FF),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildStatCard(
-                      title: "Patients",
-                      count: "12",
-                      icon: Icons.people_outline,
-                      color: const Color(0xff00C9A7),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildStatCard(
-                      title: "Treatments",
-                      count: "5",
-                      icon: Icons.medical_services_outlined,
-                      color: const Color(0xffFF8066),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildStatCard(
-                      title: "Pending",
-                      count: "2",
-                      icon: Icons.pending_actions,
-                      color: const Color(0xff845EC2),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 28),
+Row(
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: const [
+    Text(
+      "Today's Appointments",
+      style: TextStyle(
+        fontSize: 22,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+    Text(
+      "View All",
+      style: TextStyle(
+        color: Color(0xff4F7DF3),
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  ],
+),
 
-              const Text(
-                "Upcoming Appointments",
-                style: AppTextStyles.heading,
-              ),
-              const SizedBox(height: 16),
+const SizedBox(height: 20),
 
-              _buildAppointmentItem(
-                patientName: "John Doe",
-                time: "10:00 AM - 10:30 AM",
-                treatment: "Root Canal Checkup",
-              ),
-              _buildAppointmentItem(
-                patientName: "Sarah Smith",
-                time: "11:15 AM - 12:00 PM",
-                treatment: "Teeth Cleaning & Whitening",
-              ),
-              _buildAppointmentItem(
-                patientName: "Michael Brown",
-                time: "02:00 PM - 03:00 PM",
-                treatment: "Dental Implant Consultation",
-              ),
+_buildAppointmentCard(
+  patient: "John Doe",
+  treatment: "Root Canal",
+  time: "09:30 AM",
+  status: "Confirmed",
+  statusColor: Colors.green,
+),
+
+const SizedBox(height: 15),
+
+_buildAppointmentCard(
+  patient: "Emily Watson",
+  treatment: "Teeth Cleaning",
+  time: "11:00 AM",
+  status: "Pending",
+  statusColor: Colors.orange,
+),
+
+const SizedBox(height: 15),
+
+_buildAppointmentCard(
+  patient: "Michael Brown",
+  treatment: "Dental Implant",
+  time: "02:00 PM",
+  status: "Upcoming",
+  statusColor: Colors.blue,
+),
+
+const SizedBox(height: 25),
             ],
           ),
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: currentIndex,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: const Color(0xff4F7DF3),
+        unselectedItemColor: Colors.grey,
+        onTap: (index) {
+          setState(() {
+            currentIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: "Home",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: "Patients",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_today),
+            label: "Appointments",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: "Profile",
+          ),
+        ],
+      ),
     );
   }
-
-  Widget _buildStatCard({
+  Widget _dashboardCard({
     required String title,
-    required String count,
+    required String value,
     required IconData icon,
-    required Color color,
+    required Color iconColor,
+    required Color iconBackground,
   }) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(.08),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
+          CircleAvatar(
+            radius: 24,
+            backgroundColor: iconBackground,
+            child: Icon(
+              icon,
+              color: iconColor,
+              size: 26,
             ),
-            child: Icon(icon, color: color, size: 24),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 15),
           Text(
-            count,
+            value,
             style: const TextStyle(
-              fontSize: 24,
+              fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: AppColors.heading,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             title,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade600,
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.grey,
+              fontSize: 13,
             ),
           ),
         ],
@@ -239,82 +342,84 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAppointmentItem({
-    required String patientName,
-    required String time,
+  Widget _buildAppointmentCard({
+    required String patient,
     required String treatment,
+    required String time,
+    required String status,
+    required Color statusColor,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(.08),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Row(
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                patientName.isNotEmpty ? patientName[0].toUpperCase() : 'P',
-                style: const TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
+          const CircleAvatar(
+            radius: 28,
+            backgroundColor: Color(0xffEAF2FF),
+            child: Icon(
+              Icons.person,
+              color: Color(0xff4F7DF3),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 15),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  patientName,
+                  patient,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: AppColors.heading,
+                    fontSize: 17,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: 5),
                 Text(
                   treatment,
-                  style: TextStyle(
-                    color: Colors.grey.shade600,
-                    fontSize: 14,
+                  style: const TextStyle(
+                    color: Colors.grey,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  time,
+                  style: const TextStyle(
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xffEEF4FF),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  time,
-                  style: const TextStyle(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                  ),
-                ),
+
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14,
+              vertical: 8,
+            ),
+            decoration: BoxDecoration(
+              color: statusColor.withOpacity(.12),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              status,
+              style: TextStyle(
+                color: statusColor,
+                fontWeight: FontWeight.bold,
               ),
-            ],
+            ),
           ),
         ],
       ),
