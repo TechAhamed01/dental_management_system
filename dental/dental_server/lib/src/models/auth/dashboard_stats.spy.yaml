@@ -5,3 +5,5 @@ fields:
   pendingDoctors: int
   approvedDoctors: int
   rejectedDoctors: int
+  suspendedDoctors: int
+  terminatedDoctors: int

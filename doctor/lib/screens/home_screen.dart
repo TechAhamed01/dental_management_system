@@ -103,7 +103,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "${currentDentist?.specialization ?? 'Specialist'} • ${currentDentist?.clinicName ?? 'Dental Clinic'}",
+                      "${currentDentist?.specialization ?? 'Specialist'} • ${currentDentist?.clinicName ?? 'Dental Clinic'} | Code: ${currentDentist?.dentistCode ?? '-'}",
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.9),
                         fontSize: 14,

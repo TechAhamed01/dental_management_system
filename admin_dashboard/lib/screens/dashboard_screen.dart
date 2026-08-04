@@ -63,6 +63,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         title: title,
         items: dentists,
         columns: const [
+          'Code',
           'Name',
           'Email',
           'Phone',
@@ -71,6 +72,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           'Status',
         ],
         rowBuilder: (d) => [
+          d.dentistCode ?? '-',
           d.fullName,
           d.email,
           d.phone,
@@ -185,10 +187,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 'Dashboard Overview',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 22),
               ),
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: () => provider.fetchDashboardData(),
-                tooltip: 'Refresh Data',
+              Row(
+                children: [
+                  SizedBox(
+                    width: 250,
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Search Code (e.g. D0001)',
+                        prefixIcon: const Icon(Icons.search, size: 20),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+                      ),
+                      onSubmitted: (val) async {
+                        if (val.trim().isEmpty) return;
+                        final dentist = await provider.searchDentistByCode(val);
+                        if (dentist != null && context.mounted) {
+                          showDentistDetailsDialog(context, dentist, provider, readOnly: dentist.status != DentistStatus.pending);
+                        } else if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Dentist with code "$val" not found.')));
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    onPressed: () => provider.fetchDashboardData(),
+                    tooltip: 'Refresh Data',
+                  ),
+                ],
               )
             ],
           ),
@@ -231,6 +258,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 icon: Icons.cancel_outlined,
                 color: const Color(0xFFEF4444),
                 onTap: () => _showDentistsDialog(context, 'Rejected Doctors', provider.fetchRejectedDentists),
+              ),
+              _StatCard(
+                title: 'Suspended',
+                value: provider.isLoading ? '...' : '${stats?.suspendedDoctors ?? 0}',
+                icon: Icons.pause_circle_outline,
+                color: Colors.orange,
+                onTap: () => _showDentistsDialog(context, 'Suspended Doctors', provider.fetchSuspendedDentists),
+              ),
+              _StatCard(
+                title: 'Terminated',
+                value: provider.isLoading ? '...' : '${stats?.terminatedDoctors ?? 0}',
+                icon: Icons.block,
+                color: const Color(0xFF991B1B),
+                onTap: () => _showDentistsDialog(context, 'Terminated Doctors', provider.fetchTerminatedDentists),
               ),
             ],
           ),

@@ -12,20 +12,23 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import 'auth/admin.dart' as _i2;
-import 'auth/auth_response.dart' as _i3;
-import 'auth/certificate.dart' as _i4;
-import 'auth/dashboard_stats.dart' as _i5;
-import 'auth/dentist.dart' as _i6;
-import 'auth/dentist_status.dart' as _i7;
-import 'auth/patient.dart' as _i8;
-import 'greetings/greeting.dart' as _i9;
-import 'package:dental_client/src/protocol/auth/dentist.dart' as _i10;
-import 'package:dental_client/src/protocol/auth/patient.dart' as _i11;
+import 'auth/audit_log.dart' as _i3;
+import 'auth/auth_response.dart' as _i4;
+import 'auth/certificate.dart' as _i5;
+import 'auth/dashboard_stats.dart' as _i6;
+import 'auth/dentist.dart' as _i7;
+import 'auth/dentist_status.dart' as _i8;
+import 'auth/patient.dart' as _i9;
+import 'greetings/greeting.dart' as _i10;
+import 'package:dental_client/src/protocol/auth/dentist.dart' as _i11;
+import 'package:dental_client/src/protocol/auth/audit_log.dart' as _i12;
+import 'package:dental_client/src/protocol/auth/patient.dart' as _i13;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
-    as _i12;
+    as _i14;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
-    as _i13;
+    as _i15;
 export 'auth/admin.dart';
+export 'auth/audit_log.dart';
 export 'auth/auth_response.dart';
 export 'auth/certificate.dart';
 export 'auth/dashboard_stats.dart';
@@ -72,64 +75,74 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i2.Admin) {
       return _i2.Admin.fromJson(data) as T;
     }
-    if (t == _i3.AuthResponse) {
-      return _i3.AuthResponse.fromJson(data) as T;
+    if (t == _i3.AuditLog) {
+      return _i3.AuditLog.fromJson(data) as T;
     }
-    if (t == _i4.Certificate) {
-      return _i4.Certificate.fromJson(data) as T;
+    if (t == _i4.AuthResponse) {
+      return _i4.AuthResponse.fromJson(data) as T;
     }
-    if (t == _i5.DashboardStats) {
-      return _i5.DashboardStats.fromJson(data) as T;
+    if (t == _i5.Certificate) {
+      return _i5.Certificate.fromJson(data) as T;
     }
-    if (t == _i6.Dentist) {
-      return _i6.Dentist.fromJson(data) as T;
+    if (t == _i6.DashboardStats) {
+      return _i6.DashboardStats.fromJson(data) as T;
     }
-    if (t == _i7.DentistStatus) {
-      return _i7.DentistStatus.fromJson(data) as T;
+    if (t == _i7.Dentist) {
+      return _i7.Dentist.fromJson(data) as T;
     }
-    if (t == _i8.Patient) {
-      return _i8.Patient.fromJson(data) as T;
+    if (t == _i8.DentistStatus) {
+      return _i8.DentistStatus.fromJson(data) as T;
     }
-    if (t == _i9.Greeting) {
-      return _i9.Greeting.fromJson(data) as T;
+    if (t == _i9.Patient) {
+      return _i9.Patient.fromJson(data) as T;
+    }
+    if (t == _i10.Greeting) {
+      return _i10.Greeting.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.Admin?>()) {
       return (data != null ? _i2.Admin.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i3.AuthResponse?>()) {
-      return (data != null ? _i3.AuthResponse.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i3.AuditLog?>()) {
+      return (data != null ? _i3.AuditLog.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i4.Certificate?>()) {
-      return (data != null ? _i4.Certificate.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i4.AuthResponse?>()) {
+      return (data != null ? _i4.AuthResponse.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i5.DashboardStats?>()) {
-      return (data != null ? _i5.DashboardStats.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i5.Certificate?>()) {
+      return (data != null ? _i5.Certificate.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i6.Dentist?>()) {
-      return (data != null ? _i6.Dentist.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i6.DashboardStats?>()) {
+      return (data != null ? _i6.DashboardStats.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i7.DentistStatus?>()) {
-      return (data != null ? _i7.DentistStatus.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i7.Dentist?>()) {
+      return (data != null ? _i7.Dentist.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i8.Patient?>()) {
-      return (data != null ? _i8.Patient.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i8.DentistStatus?>()) {
+      return (data != null ? _i8.DentistStatus.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i9.Greeting?>()) {
-      return (data != null ? _i9.Greeting.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i9.Patient?>()) {
+      return (data != null ? _i9.Patient.fromJson(data) : null) as T;
     }
-    if (t == List<_i10.Dentist>) {
-      return (data as List).map((e) => deserialize<_i10.Dentist>(e)).toList()
+    if (t == _i1.getType<_i10.Greeting?>()) {
+      return (data != null ? _i10.Greeting.fromJson(data) : null) as T;
+    }
+    if (t == List<_i11.Dentist>) {
+      return (data as List).map((e) => deserialize<_i11.Dentist>(e)).toList()
           as T;
     }
-    if (t == List<_i11.Patient>) {
-      return (data as List).map((e) => deserialize<_i11.Patient>(e)).toList()
+    if (t == List<_i12.AuditLog>) {
+      return (data as List).map((e) => deserialize<_i12.AuditLog>(e)).toList()
+          as T;
+    }
+    if (t == List<_i13.Patient>) {
+      return (data as List).map((e) => deserialize<_i13.Patient>(e)).toList()
           as T;
     }
     try {
-      return _i12.Protocol().deserialize<T>(data, t);
+      return _i14.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     try {
-      return _i13.Protocol().deserialize<T>(data, t);
+      return _i15.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -137,13 +150,14 @@ class Protocol extends _i1.SerializationManager {
   static String? getClassNameForType(Type type) {
     return switch (type) {
       _i2.Admin => 'Admin',
-      _i3.AuthResponse => 'AuthResponse',
-      _i4.Certificate => 'Certificate',
-      _i5.DashboardStats => 'DashboardStats',
-      _i6.Dentist => 'Dentist',
-      _i7.DentistStatus => 'DentistStatus',
-      _i8.Patient => 'Patient',
-      _i9.Greeting => 'Greeting',
+      _i3.AuditLog => 'AuditLog',
+      _i4.AuthResponse => 'AuthResponse',
+      _i5.Certificate => 'Certificate',
+      _i6.DashboardStats => 'DashboardStats',
+      _i7.Dentist => 'Dentist',
+      _i8.DentistStatus => 'DentistStatus',
+      _i9.Patient => 'Patient',
+      _i10.Greeting => 'Greeting',
       _ => null,
     };
   }
@@ -160,26 +174,28 @@ class Protocol extends _i1.SerializationManager {
     switch (data) {
       case _i2.Admin():
         return 'Admin';
-      case _i3.AuthResponse():
+      case _i3.AuditLog():
+        return 'AuditLog';
+      case _i4.AuthResponse():
         return 'AuthResponse';
-      case _i4.Certificate():
+      case _i5.Certificate():
         return 'Certificate';
-      case _i5.DashboardStats():
+      case _i6.DashboardStats():
         return 'DashboardStats';
-      case _i6.Dentist():
+      case _i7.Dentist():
         return 'Dentist';
-      case _i7.DentistStatus():
+      case _i8.DentistStatus():
         return 'DentistStatus';
-      case _i8.Patient():
+      case _i9.Patient():
         return 'Patient';
-      case _i9.Greeting():
+      case _i10.Greeting():
         return 'Greeting';
     }
-    className = _i12.Protocol().getClassNameForObject(data);
+    className = _i14.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth_idp.$className';
     }
-    className = _i13.Protocol().getClassNameForObject(data);
+    className = _i15.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth_core.$className';
     }
@@ -195,34 +211,37 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'Admin') {
       return deserialize<_i2.Admin>(data['data']);
     }
+    if (dataClassName == 'AuditLog') {
+      return deserialize<_i3.AuditLog>(data['data']);
+    }
     if (dataClassName == 'AuthResponse') {
-      return deserialize<_i3.AuthResponse>(data['data']);
+      return deserialize<_i4.AuthResponse>(data['data']);
     }
     if (dataClassName == 'Certificate') {
-      return deserialize<_i4.Certificate>(data['data']);
+      return deserialize<_i5.Certificate>(data['data']);
     }
     if (dataClassName == 'DashboardStats') {
-      return deserialize<_i5.DashboardStats>(data['data']);
+      return deserialize<_i6.DashboardStats>(data['data']);
     }
     if (dataClassName == 'Dentist') {
-      return deserialize<_i6.Dentist>(data['data']);
+      return deserialize<_i7.Dentist>(data['data']);
     }
     if (dataClassName == 'DentistStatus') {
-      return deserialize<_i7.DentistStatus>(data['data']);
+      return deserialize<_i8.DentistStatus>(data['data']);
     }
     if (dataClassName == 'Patient') {
-      return deserialize<_i8.Patient>(data['data']);
+      return deserialize<_i9.Patient>(data['data']);
     }
     if (dataClassName == 'Greeting') {
-      return deserialize<_i9.Greeting>(data['data']);
+      return deserialize<_i10.Greeting>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);
-      return _i12.Protocol().deserializeByClassName(data);
+      return _i14.Protocol().deserializeByClassName(data);
     }
     if (dataClassName.startsWith('serverpod_auth_core.')) {
       data['className'] = dataClassName.substring(20);
-      return _i13.Protocol().deserializeByClassName(data);
+      return _i15.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }
@@ -237,10 +256,10 @@ class Protocol extends _i1.SerializationManager {
       return null;
     }
     try {
-      return _i12.Protocol().mapRecordToJson(record);
+      return _i14.Protocol().mapRecordToJson(record);
     } catch (_) {}
     try {
-      return _i13.Protocol().mapRecordToJson(record);
+      return _i15.Protocol().mapRecordToJson(record);
     } catch (_) {}
     throw Exception('Unsupported record type ${record.runtimeType}');
   }

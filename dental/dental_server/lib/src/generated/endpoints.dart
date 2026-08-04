@@ -530,6 +530,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<int>(),
               nullable: false,
             ),
+            'adminEmail': _i1.ParameterDescription(
+              name: 'adminEmail',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
           },
           call:
               (
@@ -538,10 +543,108 @@ class Endpoints extends _i1.EndpointDispatch {
               ) async => (endpoints['auth'] as _i4.AuthEndpoint).approveDentist(
                 session,
                 params['dentistId'],
+                adminEmail: params['adminEmail'],
               ),
         ),
         'rejectDentist': _i1.MethodConnector(
           name: 'rejectDentist',
+          params: {
+            'dentistId': _i1.ParameterDescription(
+              name: 'dentistId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'adminEmail': _i1.ParameterDescription(
+              name: 'adminEmail',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'reason': _i1.ParameterDescription(
+              name: 'reason',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['auth'] as _i4.AuthEndpoint).rejectDentist(
+                session,
+                params['dentistId'],
+                adminEmail: params['adminEmail'],
+                reason: params['reason'],
+              ),
+        ),
+        'suspendDentist': _i1.MethodConnector(
+          name: 'suspendDentist',
+          params: {
+            'dentistId': _i1.ParameterDescription(
+              name: 'dentistId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'endsAt': _i1.ParameterDescription(
+              name: 'endsAt',
+              type: _i1.getType<DateTime>(),
+              nullable: false,
+            ),
+            'reason': _i1.ParameterDescription(
+              name: 'reason',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'adminEmail': _i1.ParameterDescription(
+              name: 'adminEmail',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['auth'] as _i4.AuthEndpoint).suspendDentist(
+                session,
+                params['dentistId'],
+                params['endsAt'],
+                params['reason'],
+                adminEmail: params['adminEmail'],
+              ),
+        ),
+        'terminateDentist': _i1.MethodConnector(
+          name: 'terminateDentist',
+          params: {
+            'dentistId': _i1.ParameterDescription(
+              name: 'dentistId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'reason': _i1.ParameterDescription(
+              name: 'reason',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'adminEmail': _i1.ParameterDescription(
+              name: 'adminEmail',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['auth'] as _i4.AuthEndpoint).terminateDentist(
+                    session,
+                    params['dentistId'],
+                    params['reason'],
+                    adminEmail: params['adminEmail'],
+                  ),
+        ),
+        'getDentistAuditLogs': _i1.MethodConnector(
+          name: 'getDentistAuditLogs',
           params: {
             'dentistId': _i1.ParameterDescription(
               name: 'dentistId',
@@ -553,10 +656,54 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint).rejectDentist(
+              ) async =>
+                  (endpoints['auth'] as _i4.AuthEndpoint).getDentistAuditLogs(
+                    session,
+                    params['dentistId'],
+                  ),
+        ),
+        'logPdfDownload': _i1.MethodConnector(
+          name: 'logPdfDownload',
+          params: {
+            'dentistId': _i1.ParameterDescription(
+              name: 'dentistId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'adminEmail': _i1.ParameterDescription(
+              name: 'adminEmail',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['auth'] as _i4.AuthEndpoint).logPdfDownload(
                 session,
                 params['dentistId'],
+                adminEmail: params['adminEmail'],
               ),
+        ),
+        'searchDentistByCode': _i1.MethodConnector(
+          name: 'searchDentistByCode',
+          params: {
+            'code': _i1.ParameterDescription(
+              name: 'code',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['auth'] as _i4.AuthEndpoint).searchDentistByCode(
+                    session,
+                    params['code'],
+                  ),
         ),
         'getDashboardStats': _i1.MethodConnector(
           name: 'getDashboardStats',
@@ -609,6 +756,26 @@ class Endpoints extends _i1.EndpointDispatch {
                 Map<String, dynamic> params,
               ) async => (endpoints['auth'] as _i4.AuthEndpoint)
                   .getRejectedDentists(session),
+        ),
+        'getSuspendedDentists': _i1.MethodConnector(
+          name: 'getSuspendedDentists',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['auth'] as _i4.AuthEndpoint)
+                  .getSuspendedDentists(session),
+        ),
+        'getTerminatedDentists': _i1.MethodConnector(
+          name: 'getTerminatedDentists',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['auth'] as _i4.AuthEndpoint)
+                  .getTerminatedDentists(session),
         ),
       },
     );

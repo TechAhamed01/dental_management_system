@@ -37,8 +37,10 @@ dependencies:
   serverpod_flutter: ^3.4.11
   provider: ^6.1.5+1
   google_fonts: ^8.1.0
+  pdf: ^3.11.1
   dental_client:
     path: ../dental/dental_client
+  syncfusion_flutter_pdf: ^34.1.32
 
 dev_dependencies:
   flutter_test:

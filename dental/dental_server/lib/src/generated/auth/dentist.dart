@@ -17,6 +17,7 @@ abstract class Dentist
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
   Dentist._({
     this.id,
+    this.dentistCode,
     required this.fullName,
     required this.email,
     required this.phone,
@@ -34,10 +35,18 @@ abstract class Dentist
     this.idFileUrl,
     required this.isTermsAccepted,
     required this.status,
+    this.suspendedAt,
+    this.suspensionEndsAt,
+    this.suspensionReason,
+    this.suspendedBy,
+    this.terminatedAt,
+    this.terminationReason,
+    this.terminatedBy,
   });
 
   factory Dentist({
     int? id,
+    String? dentistCode,
     required String fullName,
     required String email,
     required String phone,
@@ -55,11 +64,19 @@ abstract class Dentist
     String? idFileUrl,
     required bool isTermsAccepted,
     required _i2.DentistStatus status,
+    DateTime? suspendedAt,
+    DateTime? suspensionEndsAt,
+    String? suspensionReason,
+    String? suspendedBy,
+    DateTime? terminatedAt,
+    String? terminationReason,
+    String? terminatedBy,
   }) = _DentistImpl;
 
   factory Dentist.fromJson(Map<String, dynamic> jsonSerialization) {
     return Dentist(
       id: jsonSerialization['id'] as int?,
+      dentistCode: jsonSerialization['dentistCode'] as String?,
       fullName: jsonSerialization['fullName'] as String,
       email: jsonSerialization['email'] as String,
       phone: jsonSerialization['phone'] as String,
@@ -81,6 +98,25 @@ abstract class Dentist
       status: _i2.DentistStatus.fromJson(
         (jsonSerialization['status'] as String),
       ),
+      suspendedAt: jsonSerialization['suspendedAt'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(
+              jsonSerialization['suspendedAt'],
+            ),
+      suspensionEndsAt: jsonSerialization['suspensionEndsAt'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(
+              jsonSerialization['suspensionEndsAt'],
+            ),
+      suspensionReason: jsonSerialization['suspensionReason'] as String?,
+      suspendedBy: jsonSerialization['suspendedBy'] as String?,
+      terminatedAt: jsonSerialization['terminatedAt'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(
+              jsonSerialization['terminatedAt'],
+            ),
+      terminationReason: jsonSerialization['terminationReason'] as String?,
+      terminatedBy: jsonSerialization['terminatedBy'] as String?,
     );
   }
 
@@ -90,6 +126,8 @@ abstract class Dentist
 
   @override
   int? id;
+
+  String? dentistCode;
 
   String fullName;
 
@@ -125,6 +163,20 @@ abstract class Dentist
 
   _i2.DentistStatus status;
 
+  DateTime? suspendedAt;
+
+  DateTime? suspensionEndsAt;
+
+  String? suspensionReason;
+
+  String? suspendedBy;
+
+  DateTime? terminatedAt;
+
+  String? terminationReason;
+
+  String? terminatedBy;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -133,6 +185,7 @@ abstract class Dentist
   @_i1.useResult
   Dentist copyWith({
     int? id,
+    String? dentistCode,
     String? fullName,
     String? email,
     String? phone,
@@ -150,12 +203,20 @@ abstract class Dentist
     String? idFileUrl,
     bool? isTermsAccepted,
     _i2.DentistStatus? status,
+    DateTime? suspendedAt,
+    DateTime? suspensionEndsAt,
+    String? suspensionReason,
+    String? suspendedBy,
+    DateTime? terminatedAt,
+    String? terminationReason,
+    String? terminatedBy,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       '__className__': 'Dentist',
       if (id != null) 'id': id,
+      if (dentistCode != null) 'dentistCode': dentistCode,
       'fullName': fullName,
       'email': email,
       'phone': phone,
@@ -174,6 +235,14 @@ abstract class Dentist
       if (idFileUrl != null) 'idFileUrl': idFileUrl,
       'isTermsAccepted': isTermsAccepted,
       'status': status.toJson(),
+      if (suspendedAt != null) 'suspendedAt': suspendedAt?.toJson(),
+      if (suspensionEndsAt != null)
+        'suspensionEndsAt': suspensionEndsAt?.toJson(),
+      if (suspensionReason != null) 'suspensionReason': suspensionReason,
+      if (suspendedBy != null) 'suspendedBy': suspendedBy,
+      if (terminatedAt != null) 'terminatedAt': terminatedAt?.toJson(),
+      if (terminationReason != null) 'terminationReason': terminationReason,
+      if (terminatedBy != null) 'terminatedBy': terminatedBy,
     };
   }
 
@@ -182,6 +251,7 @@ abstract class Dentist
     return {
       '__className__': 'Dentist',
       if (id != null) 'id': id,
+      if (dentistCode != null) 'dentistCode': dentistCode,
       'fullName': fullName,
       'email': email,
       'phone': phone,
@@ -200,6 +270,14 @@ abstract class Dentist
       if (idFileUrl != null) 'idFileUrl': idFileUrl,
       'isTermsAccepted': isTermsAccepted,
       'status': status.toJson(),
+      if (suspendedAt != null) 'suspendedAt': suspendedAt?.toJson(),
+      if (suspensionEndsAt != null)
+        'suspensionEndsAt': suspensionEndsAt?.toJson(),
+      if (suspensionReason != null) 'suspensionReason': suspensionReason,
+      if (suspendedBy != null) 'suspendedBy': suspendedBy,
+      if (terminatedAt != null) 'terminatedAt': terminatedAt?.toJson(),
+      if (terminationReason != null) 'terminationReason': terminationReason,
+      if (terminatedBy != null) 'terminatedBy': terminatedBy,
     };
   }
 
@@ -238,6 +316,7 @@ class _Undefined {}
 class _DentistImpl extends Dentist {
   _DentistImpl({
     int? id,
+    String? dentistCode,
     required String fullName,
     required String email,
     required String phone,
@@ -255,8 +334,16 @@ class _DentistImpl extends Dentist {
     String? idFileUrl,
     required bool isTermsAccepted,
     required _i2.DentistStatus status,
+    DateTime? suspendedAt,
+    DateTime? suspensionEndsAt,
+    String? suspensionReason,
+    String? suspendedBy,
+    DateTime? terminatedAt,
+    String? terminationReason,
+    String? terminatedBy,
   }) : super._(
          id: id,
+         dentistCode: dentistCode,
          fullName: fullName,
          email: email,
          phone: phone,
@@ -274,6 +361,13 @@ class _DentistImpl extends Dentist {
          idFileUrl: idFileUrl,
          isTermsAccepted: isTermsAccepted,
          status: status,
+         suspendedAt: suspendedAt,
+         suspensionEndsAt: suspensionEndsAt,
+         suspensionReason: suspensionReason,
+         suspendedBy: suspendedBy,
+         terminatedAt: terminatedAt,
+         terminationReason: terminationReason,
+         terminatedBy: terminatedBy,
        );
 
   /// Returns a shallow copy of this [Dentist]
@@ -282,6 +376,7 @@ class _DentistImpl extends Dentist {
   @override
   Dentist copyWith({
     Object? id = _Undefined,
+    Object? dentistCode = _Undefined,
     String? fullName,
     String? email,
     String? phone,
@@ -299,9 +394,17 @@ class _DentistImpl extends Dentist {
     Object? idFileUrl = _Undefined,
     bool? isTermsAccepted,
     _i2.DentistStatus? status,
+    Object? suspendedAt = _Undefined,
+    Object? suspensionEndsAt = _Undefined,
+    Object? suspensionReason = _Undefined,
+    Object? suspendedBy = _Undefined,
+    Object? terminatedAt = _Undefined,
+    Object? terminationReason = _Undefined,
+    Object? terminatedBy = _Undefined,
   }) {
     return Dentist(
       id: id is int? ? id : this.id,
+      dentistCode: dentistCode is String? ? dentistCode : this.dentistCode,
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
       phone: phone ?? this.phone,
@@ -327,12 +430,32 @@ class _DentistImpl extends Dentist {
       idFileUrl: idFileUrl is String? ? idFileUrl : this.idFileUrl,
       isTermsAccepted: isTermsAccepted ?? this.isTermsAccepted,
       status: status ?? this.status,
+      suspendedAt: suspendedAt is DateTime? ? suspendedAt : this.suspendedAt,
+      suspensionEndsAt: suspensionEndsAt is DateTime?
+          ? suspensionEndsAt
+          : this.suspensionEndsAt,
+      suspensionReason: suspensionReason is String?
+          ? suspensionReason
+          : this.suspensionReason,
+      suspendedBy: suspendedBy is String? ? suspendedBy : this.suspendedBy,
+      terminatedAt: terminatedAt is DateTime?
+          ? terminatedAt
+          : this.terminatedAt,
+      terminationReason: terminationReason is String?
+          ? terminationReason
+          : this.terminationReason,
+      terminatedBy: terminatedBy is String? ? terminatedBy : this.terminatedBy,
     );
   }
 }
 
 class DentistUpdateTable extends _i1.UpdateTable<DentistTable> {
   DentistUpdateTable(super.table);
+
+  _i1.ColumnValue<String, String> dentistCode(String? value) => _i1.ColumnValue(
+    table.dentistCode,
+    value,
+  );
 
   _i1.ColumnValue<String, String> fullName(String value) => _i1.ColumnValue(
     table.fullName,
@@ -427,11 +550,56 @@ class DentistUpdateTable extends _i1.UpdateTable<DentistTable> {
     table.status,
     value,
   );
+
+  _i1.ColumnValue<DateTime, DateTime> suspendedAt(DateTime? value) =>
+      _i1.ColumnValue(
+        table.suspendedAt,
+        value,
+      );
+
+  _i1.ColumnValue<DateTime, DateTime> suspensionEndsAt(DateTime? value) =>
+      _i1.ColumnValue(
+        table.suspensionEndsAt,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> suspensionReason(String? value) =>
+      _i1.ColumnValue(
+        table.suspensionReason,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> suspendedBy(String? value) => _i1.ColumnValue(
+    table.suspendedBy,
+    value,
+  );
+
+  _i1.ColumnValue<DateTime, DateTime> terminatedAt(DateTime? value) =>
+      _i1.ColumnValue(
+        table.terminatedAt,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> terminationReason(String? value) =>
+      _i1.ColumnValue(
+        table.terminationReason,
+        value,
+      );
+
+  _i1.ColumnValue<String, String> terminatedBy(String? value) =>
+      _i1.ColumnValue(
+        table.terminatedBy,
+        value,
+      );
 }
 
 class DentistTable extends _i1.Table<int?> {
   DentistTable({super.tableRelation}) : super(tableName: 'dentist') {
     updateTable = DentistUpdateTable(this);
+    dentistCode = _i1.ColumnString(
+      'dentistCode',
+      this,
+    );
     fullName = _i1.ColumnString(
       'fullName',
       this,
@@ -501,9 +669,39 @@ class DentistTable extends _i1.Table<int?> {
       this,
       _i1.EnumSerialization.byName,
     );
+    suspendedAt = _i1.ColumnDateTime(
+      'suspendedAt',
+      this,
+    );
+    suspensionEndsAt = _i1.ColumnDateTime(
+      'suspensionEndsAt',
+      this,
+    );
+    suspensionReason = _i1.ColumnString(
+      'suspensionReason',
+      this,
+    );
+    suspendedBy = _i1.ColumnString(
+      'suspendedBy',
+      this,
+    );
+    terminatedAt = _i1.ColumnDateTime(
+      'terminatedAt',
+      this,
+    );
+    terminationReason = _i1.ColumnString(
+      'terminationReason',
+      this,
+    );
+    terminatedBy = _i1.ColumnString(
+      'terminatedBy',
+      this,
+    );
   }
 
   late final DentistUpdateTable updateTable;
+
+  late final _i1.ColumnString dentistCode;
 
   late final _i1.ColumnString fullName;
 
@@ -539,9 +737,24 @@ class DentistTable extends _i1.Table<int?> {
 
   late final _i1.ColumnEnum<_i2.DentistStatus> status;
 
+  late final _i1.ColumnDateTime suspendedAt;
+
+  late final _i1.ColumnDateTime suspensionEndsAt;
+
+  late final _i1.ColumnString suspensionReason;
+
+  late final _i1.ColumnString suspendedBy;
+
+  late final _i1.ColumnDateTime terminatedAt;
+
+  late final _i1.ColumnString terminationReason;
+
+  late final _i1.ColumnString terminatedBy;
+
   @override
   List<_i1.Column> get columns => [
     id,
+    dentistCode,
     fullName,
     email,
     phone,
@@ -559,6 +772,13 @@ class DentistTable extends _i1.Table<int?> {
     idFileUrl,
     isTermsAccepted,
     status,
+    suspendedAt,
+    suspensionEndsAt,
+    suspensionReason,
+    suspendedBy,
+    terminatedAt,
+    terminationReason,
+    terminatedBy,
   ];
 }
 

@@ -20,10 +20,17 @@ auth:
   - getPendingDentists:
   - approveDentist:
   - rejectDentist:
+  - suspendDentist:
+  - terminateDentist:
+  - getDentistAuditLogs:
+  - logPdfDownload:
+  - searchDentistByCode:
   - getDashboardStats:
   - getAllPatients:
   - getAllDentists:
   - getApprovedDentists:
   - getRejectedDentists:
+  - getSuspendedDentists:
+  - getTerminatedDentists:
 greeting:
   - hello:

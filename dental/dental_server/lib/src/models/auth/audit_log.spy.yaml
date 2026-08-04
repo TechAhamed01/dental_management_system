@@ -1,0 +1,8 @@
+class: AuditLog
+table: audit_log
+fields:
+  dentistId: int
+  adminEmail: String
+  action: String
+  reason: String?
+  timestamp: DateTime

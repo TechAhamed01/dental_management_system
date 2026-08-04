@@ -34,7 +34,7 @@ class DashboardProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
     try {
-      await client.auth.approveDentist(id);
+      await client.auth.approveDentist(id, adminEmail: 'admin@dental.com');
       _pendingDentists.removeWhere((d) => d.id == id);
       if (_stats != null) {
         _stats = DashboardStats(
@@ -43,6 +43,8 @@ class DashboardProvider extends ChangeNotifier {
           pendingDoctors: _stats!.pendingDoctors - 1,
           approvedDoctors: _stats!.approvedDoctors + 1,
           rejectedDoctors: _stats!.rejectedDoctors,
+          suspendedDoctors: _stats!.suspendedDoctors,
+          terminatedDoctors: _stats!.terminatedDoctors,
         );
       }
       notifyListeners();
@@ -59,7 +61,7 @@ class DashboardProvider extends ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
     try {
-      await client.auth.rejectDentist(id);
+      await client.auth.rejectDentist(id, adminEmail: 'admin@dental.com');
       _pendingDentists.removeWhere((d) => d.id == id);
       if (_stats != null) {
         _stats = DashboardStats(
@@ -68,6 +70,8 @@ class DashboardProvider extends ChangeNotifier {
           pendingDoctors: _stats!.pendingDoctors - 1,
           approvedDoctors: _stats!.approvedDoctors,
           rejectedDoctors: _stats!.rejectedDoctors + 1,
+          suspendedDoctors: _stats!.suspendedDoctors,
+          terminatedDoctors: _stats!.terminatedDoctors,
         );
       }
       notifyListeners();
@@ -94,6 +98,78 @@ class DashboardProvider extends ChangeNotifier {
 
   Future<List<Dentist>> fetchRejectedDentists() async {
     return await client.auth.getRejectedDentists();
+  }
+
+  Future<List<Dentist>> fetchSuspendedDentists() async {
+    return await client.auth.getSuspendedDentists();
+  }
+
+  Future<List<Dentist>> fetchTerminatedDentists() async {
+    return await client.auth.getTerminatedDentists();
+  }
+
+  Future<List<AuditLog>> fetchDentistAuditLogs(int dentistId) async {
+    try {
+      return await client.auth.getDentistAuditLogs(dentistId);
+    } catch (e) {
+      debugPrint('fetchDentistAuditLogs error: $e');
+      return [];
+    }
+  }
+
+  Future<Dentist?> searchDentistByCode(String code) async {
+    _setLoading(true);
+    _errorMessage = null;
+    try {
+      final dentist = await client.auth.searchDentistByCode(code);
+      return dentist;
+    } catch (e) {
+      debugPrint('searchDentistByCode error: $e');
+      _errorMessage = 'Search failed: ${e.toString().replaceAll('Exception: ', '')}';
+      return null;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<void> logPdfDownload(int dentistId) async {
+    try {
+      await client.auth.logPdfDownload(dentistId, adminEmail: 'admin@dental.com');
+    } catch (e) {
+      debugPrint('logPdfDownload error: $e');
+    }
+  }
+
+  Future<bool> suspendDentist(int id, DateTime endsAt, String reason) async {
+    _errorMessage = null;
+    _setLoading(true);
+    try {
+      await client.auth.suspendDentist(id, endsAt, reason, adminEmail: 'admin@dental.com');
+      await fetchDashboardData();
+      return true;
+    } catch (e) {
+      debugPrint('suspendDentist error: $e');
+      _errorMessage = 'Failed to suspend dentist: ${e.toString().replaceAll('Exception: ', '')}';
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> terminateDentist(int id, String reason) async {
+    _errorMessage = null;
+    _setLoading(true);
+    try {
+      await client.auth.terminateDentist(id, reason, adminEmail: 'admin@dental.com');
+      await fetchDashboardData();
+      return true;
+    } catch (e) {
+      debugPrint('terminateDentist error: $e');
+      _errorMessage = 'Failed to terminate dentist: ${e.toString().replaceAll('Exception: ', '')}';
+      return false;
+    } finally {
+      _setLoading(false);
+    }
   }
 
   void _setLoading(bool value) {

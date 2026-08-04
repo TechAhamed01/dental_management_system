@@ -1,6 +1,7 @@
 class: Dentist
 table: dentist
 fields:
+  dentistCode: String?
   fullName: String
   email: String
   phone: String
@@ -18,3 +19,14 @@ fields:
   idFileUrl: String?
   isTermsAccepted: bool
   status: DentistStatus
+  suspendedAt: DateTime?
+  suspensionEndsAt: DateTime?
+  suspensionReason: String?
+  suspendedBy: String?
+  terminatedAt: DateTime?
+  terminationReason: String?
+  terminatedBy: String?
+indexes:
+  dentist_code_idx:
+    fields: dentistCode
+    unique: true

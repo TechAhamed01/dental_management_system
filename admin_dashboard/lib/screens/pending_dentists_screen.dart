@@ -139,7 +139,7 @@ class _PendingDentistsScreenState extends State<PendingDentistsScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Dr. ${dentist.fullName}',
+                                        'Dr. ${dentist.fullName} ${dentist.dentistCode != null ? '(${dentist.dentistCode})' : ''}',
                                         style:
                                             Theme.of(
                                               context,
