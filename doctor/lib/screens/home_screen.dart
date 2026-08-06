@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
 
     final controller =
-        Provider.of<LoginController>(context, listen: false);
+        Provider.of<LoginController>(context);
 
     final currentDentist =
         widget.dentist ?? controller.currentDentist;
