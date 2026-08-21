@@ -5,3 +5,4 @@ fields:
   patient: Patient?
   dentist: Dentist?
   admin: Admin?
+  receptionist: Receptionist?

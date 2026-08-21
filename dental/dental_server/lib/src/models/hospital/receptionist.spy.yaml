@@ -1,0 +1,15 @@
+class: Receptionist
+table: receptionist
+fields:
+  hospitalId: int
+  hospital: Hospital?, relation(field=hospitalId)
+  fullName: String
+  email: String
+  passwordHash: String
+  phone: String
+  isActive: bool
+  createdAt: DateTime
+indexes:
+  receptionist_email_idx:
+    fields: email
+    unique: true

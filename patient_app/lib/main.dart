@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'controllers/auth_controller.dart';
 import 'screens/landing_page.dart';
 import 'services/serverpod_client.dart';
+import 'features/appointments/providers/appointment_booking_provider.dart';
+import 'features/appointments/providers/patient_appointments_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +20,8 @@ class PatientApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthController()),
+        ChangeNotifierProvider(create: (_) => AppointmentBookingProvider()),
+        ChangeNotifierProvider(create: (_) => PatientAppointmentsProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

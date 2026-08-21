@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import 'login_screen.dart';
 import '../controllers/auth_controller.dart';
+import '../features/appointments/screens/hospital_selection_screen.dart';
+import '../features/appointments/screens/my_appointments_screen.dart';
 
 
 class HomeScreen extends StatefulWidget {
@@ -92,8 +94,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
 
       body: SafeArea(
-
-        child: SingleChildScrollView(
+        child: _selectedIndex == 1 
+            ? const MyAppointmentsScreen() 
+            : _selectedIndex == 0 
+                ? SingleChildScrollView(
 
           padding: const EdgeInsets.symmetric(
             horizontal: 22,
@@ -713,7 +717,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     subtitle:"Schedule your next visit",
 
-                    onTap:(){},
+                    onTap:(){
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const HospitalSelectionScreen(),
+                        ),
+                      );
+                    },
 
                   ),
 
@@ -953,12 +964,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
           ),
 
-        ),
-
+        ) : const Center(child: Text('Coming Soon')),
       ),
-
     );
-
   }
 
 
@@ -1254,6 +1262,8 @@ Widget _quickActionCard({
   );
 
 }
+
+
 
 
 

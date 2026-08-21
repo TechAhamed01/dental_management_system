@@ -1,0 +1,16 @@
+class: Appointment
+table: appointment
+fields:
+  patientId: int
+  patient: Patient?, relation(field=patientId)
+  hospitalId: int
+  hospital: Hospital?, relation(field=hospitalId)
+  dentistId: int?
+  dentist: Dentist?, relation(field=dentistId)
+  date: DateTime
+  startTime: String
+  endTime: String
+  reason: String
+  status: AppointmentStatus
+  createdAt: DateTime
+  updatedAt: DateTime

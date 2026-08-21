@@ -77,7 +77,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           d.email,
           d.phone,
           d.specialization,
-          d.clinicName,
+          d.hospital != null ? d.hospital!.name : d.clinicName,
           d.status.name.toUpperCase(),
         ],
         onViewDetails: (dentist) {
@@ -306,7 +306,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: const Icon(Icons.person, color: AppTheme.primaryColor),
                     ),
                     title: Text('Dr. ${d.fullName}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                    subtitle: Text('${d.specialization} | ${d.clinicName}'),
+                    subtitle: Text('${d.specialization} | ${d.hospital != null ? d.hospital!.name : d.clinicName}'),
                     trailing: const Chip(
                       label: Text('Pending', style: TextStyle(color: Color(0xFFF59E0B), fontSize: 12)),
                       backgroundColor: Color(0xFFFEF3C7),

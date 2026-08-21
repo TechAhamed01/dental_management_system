@@ -8,10 +8,13 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 // ignore_for_file: invalid_use_of_internal_member
+// ignore_for_file: unnecessary_null_comparison
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../auth/dentist_status.dart' as _i2;
+import '../hospital/hospital.dart' as _i3;
+import 'package:dental_server/src/generated/protocol.dart' as _i4;
 
 abstract class Dentist
     implements _i1.TableRow<int?>, _i1.ProtocolSerialization {
@@ -42,6 +45,8 @@ abstract class Dentist
     this.terminatedAt,
     this.terminationReason,
     this.terminatedBy,
+    this.hospitalId,
+    this.hospital,
   });
 
   factory Dentist({
@@ -71,6 +76,8 @@ abstract class Dentist
     DateTime? terminatedAt,
     String? terminationReason,
     String? terminatedBy,
+    int? hospitalId,
+    _i3.Hospital? hospital,
   }) = _DentistImpl;
 
   factory Dentist.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -117,6 +124,12 @@ abstract class Dentist
             ),
       terminationReason: jsonSerialization['terminationReason'] as String?,
       terminatedBy: jsonSerialization['terminatedBy'] as String?,
+      hospitalId: jsonSerialization['hospitalId'] as int?,
+      hospital: jsonSerialization['hospital'] == null
+          ? null
+          : _i4.Protocol().deserialize<_i3.Hospital>(
+              jsonSerialization['hospital'],
+            ),
     );
   }
 
@@ -177,6 +190,10 @@ abstract class Dentist
 
   String? terminatedBy;
 
+  int? hospitalId;
+
+  _i3.Hospital? hospital;
+
   @override
   _i1.Table<int?> get table => t;
 
@@ -210,6 +227,8 @@ abstract class Dentist
     DateTime? terminatedAt,
     String? terminationReason,
     String? terminatedBy,
+    int? hospitalId,
+    _i3.Hospital? hospital,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -243,6 +262,8 @@ abstract class Dentist
       if (terminatedAt != null) 'terminatedAt': terminatedAt?.toJson(),
       if (terminationReason != null) 'terminationReason': terminationReason,
       if (terminatedBy != null) 'terminatedBy': terminatedBy,
+      if (hospitalId != null) 'hospitalId': hospitalId,
+      if (hospital != null) 'hospital': hospital?.toJson(),
     };
   }
 
@@ -278,11 +299,13 @@ abstract class Dentist
       if (terminatedAt != null) 'terminatedAt': terminatedAt?.toJson(),
       if (terminationReason != null) 'terminationReason': terminationReason,
       if (terminatedBy != null) 'terminatedBy': terminatedBy,
+      if (hospitalId != null) 'hospitalId': hospitalId,
+      if (hospital != null) 'hospital': hospital?.toJsonForProtocol(),
     };
   }
 
-  static DentistInclude include() {
-    return DentistInclude._();
+  static DentistInclude include({_i3.HospitalInclude? hospital}) {
+    return DentistInclude._(hospital: hospital);
   }
 
   static DentistIncludeList includeList({
@@ -341,6 +364,8 @@ class _DentistImpl extends Dentist {
     DateTime? terminatedAt,
     String? terminationReason,
     String? terminatedBy,
+    int? hospitalId,
+    _i3.Hospital? hospital,
   }) : super._(
          id: id,
          dentistCode: dentistCode,
@@ -368,6 +393,8 @@ class _DentistImpl extends Dentist {
          terminatedAt: terminatedAt,
          terminationReason: terminationReason,
          terminatedBy: terminatedBy,
+         hospitalId: hospitalId,
+         hospital: hospital,
        );
 
   /// Returns a shallow copy of this [Dentist]
@@ -401,6 +428,8 @@ class _DentistImpl extends Dentist {
     Object? terminatedAt = _Undefined,
     Object? terminationReason = _Undefined,
     Object? terminatedBy = _Undefined,
+    Object? hospitalId = _Undefined,
+    Object? hospital = _Undefined,
   }) {
     return Dentist(
       id: id is int? ? id : this.id,
@@ -445,6 +474,10 @@ class _DentistImpl extends Dentist {
           ? terminationReason
           : this.terminationReason,
       terminatedBy: terminatedBy is String? ? terminatedBy : this.terminatedBy,
+      hospitalId: hospitalId is int? ? hospitalId : this.hospitalId,
+      hospital: hospital is _i3.Hospital?
+          ? hospital
+          : this.hospital?.copyWith(),
     );
   }
 }
@@ -591,6 +624,11 @@ class DentistUpdateTable extends _i1.UpdateTable<DentistTable> {
         table.terminatedBy,
         value,
       );
+
+  _i1.ColumnValue<int, int> hospitalId(int? value) => _i1.ColumnValue(
+    table.hospitalId,
+    value,
+  );
 }
 
 class DentistTable extends _i1.Table<int?> {
@@ -697,6 +735,10 @@ class DentistTable extends _i1.Table<int?> {
       'terminatedBy',
       this,
     );
+    hospitalId = _i1.ColumnInt(
+      'hospitalId',
+      this,
+    );
   }
 
   late final DentistUpdateTable updateTable;
@@ -751,6 +793,23 @@ class DentistTable extends _i1.Table<int?> {
 
   late final _i1.ColumnString terminatedBy;
 
+  late final _i1.ColumnInt hospitalId;
+
+  _i3.HospitalTable? _hospital;
+
+  _i3.HospitalTable get hospital {
+    if (_hospital != null) return _hospital!;
+    _hospital = _i1.createRelationTable(
+      relationFieldName: 'hospital',
+      field: Dentist.t.hospitalId,
+      foreignField: _i3.Hospital.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i3.HospitalTable(tableRelation: foreignTableRelation),
+    );
+    return _hospital!;
+  }
+
   @override
   List<_i1.Column> get columns => [
     id,
@@ -779,14 +838,27 @@ class DentistTable extends _i1.Table<int?> {
     terminatedAt,
     terminationReason,
     terminatedBy,
+    hospitalId,
   ];
+
+  @override
+  _i1.Table? getRelationTable(String relationField) {
+    if (relationField == 'hospital') {
+      return hospital;
+    }
+    return null;
+  }
 }
 
 class DentistInclude extends _i1.IncludeObject {
-  DentistInclude._();
+  DentistInclude._({_i3.HospitalInclude? hospital}) {
+    _hospital = hospital;
+  }
+
+  _i3.HospitalInclude? _hospital;
 
   @override
-  Map<String, _i1.Include?> get includes => {};
+  Map<String, _i1.Include?> get includes => {'hospital': _hospital};
 
   @override
   _i1.Table<int?> get table => Dentist.t;
@@ -814,6 +886,10 @@ class DentistIncludeList extends _i1.IncludeList {
 
 class DentistRepository {
   const DentistRepository._();
+
+  final attachRow = const DentistAttachRowRepository._();
+
+  final detachRow = const DentistDetachRowRepository._();
 
   /// Returns a list of [Dentist]s matching the given query parameters.
   ///
@@ -846,6 +922,7 @@ class DentistRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<DentistTable>? orderByList,
     _i1.Transaction? transaction,
+    DentistInclude? include,
     _i1.LockMode? lockMode,
     _i1.LockBehavior? lockBehavior,
   }) async {
@@ -857,6 +934,7 @@ class DentistRepository {
       limit: limit,
       offset: offset,
       transaction: transaction,
+      include: include,
       lockMode: lockMode,
       lockBehavior: lockBehavior,
     );
@@ -887,6 +965,7 @@ class DentistRepository {
     bool orderDescending = false,
     _i1.OrderByListBuilder<DentistTable>? orderByList,
     _i1.Transaction? transaction,
+    DentistInclude? include,
     _i1.LockMode? lockMode,
     _i1.LockBehavior? lockBehavior,
   }) async {
@@ -897,6 +976,7 @@ class DentistRepository {
       orderDescending: orderDescending,
       offset: offset,
       transaction: transaction,
+      include: include,
       lockMode: lockMode,
       lockBehavior: lockBehavior,
     );
@@ -907,12 +987,14 @@ class DentistRepository {
     _i1.DatabaseSession session,
     int id, {
     _i1.Transaction? transaction,
+    DentistInclude? include,
     _i1.LockMode? lockMode,
     _i1.LockBehavior? lockBehavior,
   }) async {
     return session.db.findById<Dentist>(
       id,
       transaction: transaction,
+      include: include,
       lockMode: lockMode,
       lockBehavior: lockBehavior,
     );
@@ -1094,6 +1176,59 @@ class DentistRepository {
       where: where(Dentist.t),
       lockMode: lockMode,
       lockBehavior: lockBehavior,
+      transaction: transaction,
+    );
+  }
+}
+
+class DentistAttachRowRepository {
+  const DentistAttachRowRepository._();
+
+  /// Creates a relation between the given [Dentist] and [Hospital]
+  /// by setting the [Dentist]'s foreign key `hospitalId` to refer to the [Hospital].
+  Future<void> hospital(
+    _i1.DatabaseSession session,
+    Dentist dentist,
+    _i3.Hospital hospital, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (dentist.id == null) {
+      throw ArgumentError.notNull('dentist.id');
+    }
+    if (hospital.id == null) {
+      throw ArgumentError.notNull('hospital.id');
+    }
+
+    var $dentist = dentist.copyWith(hospitalId: hospital.id);
+    await session.db.updateRow<Dentist>(
+      $dentist,
+      columns: [Dentist.t.hospitalId],
+      transaction: transaction,
+    );
+  }
+}
+
+class DentistDetachRowRepository {
+  const DentistDetachRowRepository._();
+
+  /// Detaches the relation between this [Dentist] and the [Hospital] set in `hospital`
+  /// by setting the [Dentist]'s foreign key `hospitalId` to `null`.
+  ///
+  /// This removes the association between the two models without deleting
+  /// the related record.
+  Future<void> hospital(
+    _i1.DatabaseSession session,
+    Dentist dentist, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (dentist.id == null) {
+      throw ArgumentError.notNull('dentist.id');
+    }
+
+    var $dentist = dentist.copyWith(hospitalId: null);
+    await session.db.updateRow<Dentist>(
+      $dentist,
+      columns: [Dentist.t.hospitalId],
       transaction: transaction,
     );
   }

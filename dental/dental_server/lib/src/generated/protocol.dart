@@ -16,18 +16,30 @@ import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
     as _i3;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i4;
-import 'auth/admin.dart' as _i5;
-import 'auth/audit_log.dart' as _i6;
-import 'auth/auth_response.dart' as _i7;
-import 'auth/certificate.dart' as _i8;
-import 'auth/dashboard_stats.dart' as _i9;
-import 'auth/dentist.dart' as _i10;
-import 'auth/dentist_status.dart' as _i11;
-import 'auth/patient.dart' as _i12;
-import 'greetings/greeting.dart' as _i13;
-import 'package:dental_server/src/generated/auth/dentist.dart' as _i14;
-import 'package:dental_server/src/generated/auth/audit_log.dart' as _i15;
-import 'package:dental_server/src/generated/auth/patient.dart' as _i16;
+import 'appointment/appointment.dart' as _i5;
+import 'appointment/appointment_status.dart' as _i6;
+import 'auth/admin.dart' as _i7;
+import 'auth/audit_log.dart' as _i8;
+import 'auth/auth_response.dart' as _i9;
+import 'auth/certificate.dart' as _i10;
+import 'auth/dashboard_stats.dart' as _i11;
+import 'auth/dentist.dart' as _i12;
+import 'auth/dentist_status.dart' as _i13;
+import 'auth/patient.dart' as _i14;
+import 'dentist_document/dentist_document.dart' as _i15;
+import 'greetings/greeting.dart' as _i16;
+import 'hospital/hospital.dart' as _i17;
+import 'hospital/receptionist.dart' as _i18;
+import 'package:dental_server/src/generated/appointment/appointment.dart'
+    as _i19;
+import 'package:dental_server/src/generated/auth/dentist.dart' as _i20;
+import 'package:dental_server/src/generated/auth/audit_log.dart' as _i21;
+import 'package:dental_server/src/generated/auth/patient.dart' as _i22;
+import 'package:dental_server/src/generated/dentist_document/dentist_document.dart'
+    as _i23;
+import 'package:dental_server/src/generated/hospital/hospital.dart' as _i24;
+export 'appointment/appointment.dart';
+export 'appointment/appointment_status.dart';
 export 'auth/admin.dart';
 export 'auth/audit_log.dart';
 export 'auth/auth_response.dart';
@@ -36,7 +48,10 @@ export 'auth/dashboard_stats.dart';
 export 'auth/dentist.dart';
 export 'auth/dentist_status.dart';
 export 'auth/patient.dart';
+export 'dentist_document/dentist_document.dart';
 export 'greetings/greeting.dart';
+export 'hospital/hospital.dart';
+export 'hospital/receptionist.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -76,6 +91,129 @@ class Protocol extends _i1.SerializationManagerServer {
       indexes: [
         _i2.IndexDefinition(
           indexName: 'admin_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'appointment',
+      dartName: 'Appointment',
+      schema: 'public',
+      module: 'dental',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'appointment_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'patientId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'hospitalId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'dentistId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'date',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _i2.ColumnDefinition(
+          name: 'startTime',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'endTime',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'reason',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'status',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'protocol:AppointmentStatus',
+        ),
+        _i2.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+        _i2.ColumnDefinition(
+          name: 'updatedAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [
+        _i2.ForeignKeyDefinition(
+          constraintName: 'appointment_fk_0',
+          columns: ['patientId'],
+          referenceTable: 'patient',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+        _i2.ForeignKeyDefinition(
+          constraintName: 'appointment_fk_1',
+          columns: ['hospitalId'],
+          referenceTable: 'hospital',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+        _i2.ForeignKeyDefinition(
+          constraintName: 'appointment_fk_2',
+          columns: ['dentistId'],
+          referenceTable: 'dentist',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'appointment_pkey',
           tableSpace: null,
           elements: [
             _i2.IndexElementDefinition(
@@ -370,8 +508,25 @@ class Protocol extends _i1.SerializationManagerServer {
           isNullable: true,
           dartType: 'String?',
         ),
+        _i2.ColumnDefinition(
+          name: 'hospitalId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
       ],
-      foreignKeys: [],
+      foreignKeys: [
+        _i2.ForeignKeyDefinition(
+          constraintName: 'dentist_fk_0',
+          columns: ['hospitalId'],
+          referenceTable: 'hospital',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+      ],
       indexes: [
         _i2.IndexDefinition(
           indexName: 'dentist_pkey',
@@ -398,6 +553,185 @@ class Protocol extends _i1.SerializationManagerServer {
           type: 'btree',
           isUnique: true,
           isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'dentist_document',
+      dartName: 'DentistDocument',
+      schema: 'public',
+      module: 'dental',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'dentist_document_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'dentistId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'documentType',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'fileName',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'mimeType',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'storageKey',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'fileSize',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'uploadedAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [
+        _i2.ForeignKeyDefinition(
+          constraintName: 'dentist_document_fk_0',
+          columns: ['dentistId'],
+          referenceTable: 'dentist',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'dentist_document_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'dentist_document_dentist_id_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'dentistId',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'dentist_document_type_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'documentType',
+            ),
+          ],
+          type: 'btree',
+          isUnique: false,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
+    _i2.TableDefinition(
+      name: 'hospital',
+      dartName: 'Hospital',
+      schema: 'public',
+      module: 'dental',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'hospital_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'name',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'address',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'phone',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'email',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'isActive',
+          columnType: _i2.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+        ),
+        _i2.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'hospital_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
         ),
       ],
       managed: true,
@@ -458,6 +792,104 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       managed: true,
     ),
+    _i2.TableDefinition(
+      name: 'receptionist',
+      dartName: 'Receptionist',
+      schema: 'public',
+      module: 'dental',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault: 'nextval(\'receptionist_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'hospitalId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+        _i2.ColumnDefinition(
+          name: 'fullName',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'email',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'passwordHash',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'phone',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'isActive',
+          columnType: _i2.ColumnType.boolean,
+          isNullable: false,
+          dartType: 'bool',
+        ),
+        _i2.ColumnDefinition(
+          name: 'createdAt',
+          columnType: _i2.ColumnType.timestampWithoutTimeZone,
+          isNullable: false,
+          dartType: 'DateTime',
+        ),
+      ],
+      foreignKeys: [
+        _i2.ForeignKeyDefinition(
+          constraintName: 'receptionist_fk_0',
+          columns: ['hospitalId'],
+          referenceTable: 'hospital',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
+      ],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'receptionist_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        ),
+        _i2.IndexDefinition(
+          indexName: 'receptionist_email_idx',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'email',
+            ),
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: false,
+        ),
+      ],
+      managed: true,
+    ),
     ..._i3.Protocol.targetTableDefinitions,
     ..._i4.Protocol.targetTableDefinitions,
     ..._i2.Protocol.targetTableDefinitions,
@@ -490,70 +922,116 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
 
-    if (t == _i5.Admin) {
-      return _i5.Admin.fromJson(data) as T;
+    if (t == _i5.Appointment) {
+      return _i5.Appointment.fromJson(data) as T;
     }
-    if (t == _i6.AuditLog) {
-      return _i6.AuditLog.fromJson(data) as T;
+    if (t == _i6.AppointmentStatus) {
+      return _i6.AppointmentStatus.fromJson(data) as T;
     }
-    if (t == _i7.AuthResponse) {
-      return _i7.AuthResponse.fromJson(data) as T;
+    if (t == _i7.Admin) {
+      return _i7.Admin.fromJson(data) as T;
     }
-    if (t == _i8.Certificate) {
-      return _i8.Certificate.fromJson(data) as T;
+    if (t == _i8.AuditLog) {
+      return _i8.AuditLog.fromJson(data) as T;
     }
-    if (t == _i9.DashboardStats) {
-      return _i9.DashboardStats.fromJson(data) as T;
+    if (t == _i9.AuthResponse) {
+      return _i9.AuthResponse.fromJson(data) as T;
     }
-    if (t == _i10.Dentist) {
-      return _i10.Dentist.fromJson(data) as T;
+    if (t == _i10.Certificate) {
+      return _i10.Certificate.fromJson(data) as T;
     }
-    if (t == _i11.DentistStatus) {
-      return _i11.DentistStatus.fromJson(data) as T;
+    if (t == _i11.DashboardStats) {
+      return _i11.DashboardStats.fromJson(data) as T;
     }
-    if (t == _i12.Patient) {
-      return _i12.Patient.fromJson(data) as T;
+    if (t == _i12.Dentist) {
+      return _i12.Dentist.fromJson(data) as T;
     }
-    if (t == _i13.Greeting) {
-      return _i13.Greeting.fromJson(data) as T;
+    if (t == _i13.DentistStatus) {
+      return _i13.DentistStatus.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i5.Admin?>()) {
-      return (data != null ? _i5.Admin.fromJson(data) : null) as T;
+    if (t == _i14.Patient) {
+      return _i14.Patient.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i6.AuditLog?>()) {
-      return (data != null ? _i6.AuditLog.fromJson(data) : null) as T;
+    if (t == _i15.DentistDocument) {
+      return _i15.DentistDocument.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i7.AuthResponse?>()) {
-      return (data != null ? _i7.AuthResponse.fromJson(data) : null) as T;
+    if (t == _i16.Greeting) {
+      return _i16.Greeting.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i8.Certificate?>()) {
-      return (data != null ? _i8.Certificate.fromJson(data) : null) as T;
+    if (t == _i17.Hospital) {
+      return _i17.Hospital.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i9.DashboardStats?>()) {
-      return (data != null ? _i9.DashboardStats.fromJson(data) : null) as T;
+    if (t == _i18.Receptionist) {
+      return _i18.Receptionist.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i10.Dentist?>()) {
-      return (data != null ? _i10.Dentist.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i5.Appointment?>()) {
+      return (data != null ? _i5.Appointment.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i11.DentistStatus?>()) {
-      return (data != null ? _i11.DentistStatus.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i6.AppointmentStatus?>()) {
+      return (data != null ? _i6.AppointmentStatus.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i12.Patient?>()) {
-      return (data != null ? _i12.Patient.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i7.Admin?>()) {
+      return (data != null ? _i7.Admin.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i13.Greeting?>()) {
-      return (data != null ? _i13.Greeting.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i8.AuditLog?>()) {
+      return (data != null ? _i8.AuditLog.fromJson(data) : null) as T;
     }
-    if (t == List<_i14.Dentist>) {
-      return (data as List).map((e) => deserialize<_i14.Dentist>(e)).toList()
+    if (t == _i1.getType<_i9.AuthResponse?>()) {
+      return (data != null ? _i9.AuthResponse.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i10.Certificate?>()) {
+      return (data != null ? _i10.Certificate.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i11.DashboardStats?>()) {
+      return (data != null ? _i11.DashboardStats.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i12.Dentist?>()) {
+      return (data != null ? _i12.Dentist.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i13.DentistStatus?>()) {
+      return (data != null ? _i13.DentistStatus.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i14.Patient?>()) {
+      return (data != null ? _i14.Patient.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i15.DentistDocument?>()) {
+      return (data != null ? _i15.DentistDocument.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i16.Greeting?>()) {
+      return (data != null ? _i16.Greeting.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i17.Hospital?>()) {
+      return (data != null ? _i17.Hospital.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i18.Receptionist?>()) {
+      return (data != null ? _i18.Receptionist.fromJson(data) : null) as T;
+    }
+    if (t == List<_i19.Appointment>) {
+      return (data as List)
+              .map((e) => deserialize<_i19.Appointment>(e))
+              .toList()
           as T;
     }
-    if (t == List<_i15.AuditLog>) {
-      return (data as List).map((e) => deserialize<_i15.AuditLog>(e)).toList()
+    if (t == List<_i20.Dentist>) {
+      return (data as List).map((e) => deserialize<_i20.Dentist>(e)).toList()
           as T;
     }
-    if (t == List<_i16.Patient>) {
-      return (data as List).map((e) => deserialize<_i16.Patient>(e)).toList()
+    if (t == List<_i21.AuditLog>) {
+      return (data as List).map((e) => deserialize<_i21.AuditLog>(e)).toList()
+          as T;
+    }
+    if (t == List<_i22.Patient>) {
+      return (data as List).map((e) => deserialize<_i22.Patient>(e)).toList()
+          as T;
+    }
+    if (t == List<_i23.DentistDocument>) {
+      return (data as List)
+              .map((e) => deserialize<_i23.DentistDocument>(e))
+              .toList()
+          as T;
+    }
+    if (t == List<_i24.Hospital>) {
+      return (data as List).map((e) => deserialize<_i24.Hospital>(e)).toList()
           as T;
     }
     try {
@@ -570,15 +1048,20 @@ class Protocol extends _i1.SerializationManagerServer {
 
   static String? getClassNameForType(Type type) {
     return switch (type) {
-      _i5.Admin => 'Admin',
-      _i6.AuditLog => 'AuditLog',
-      _i7.AuthResponse => 'AuthResponse',
-      _i8.Certificate => 'Certificate',
-      _i9.DashboardStats => 'DashboardStats',
-      _i10.Dentist => 'Dentist',
-      _i11.DentistStatus => 'DentistStatus',
-      _i12.Patient => 'Patient',
-      _i13.Greeting => 'Greeting',
+      _i5.Appointment => 'Appointment',
+      _i6.AppointmentStatus => 'AppointmentStatus',
+      _i7.Admin => 'Admin',
+      _i8.AuditLog => 'AuditLog',
+      _i9.AuthResponse => 'AuthResponse',
+      _i10.Certificate => 'Certificate',
+      _i11.DashboardStats => 'DashboardStats',
+      _i12.Dentist => 'Dentist',
+      _i13.DentistStatus => 'DentistStatus',
+      _i14.Patient => 'Patient',
+      _i15.DentistDocument => 'DentistDocument',
+      _i16.Greeting => 'Greeting',
+      _i17.Hospital => 'Hospital',
+      _i18.Receptionist => 'Receptionist',
       _ => null,
     };
   }
@@ -593,24 +1076,34 @@ class Protocol extends _i1.SerializationManagerServer {
     }
 
     switch (data) {
-      case _i5.Admin():
+      case _i5.Appointment():
+        return 'Appointment';
+      case _i6.AppointmentStatus():
+        return 'AppointmentStatus';
+      case _i7.Admin():
         return 'Admin';
-      case _i6.AuditLog():
+      case _i8.AuditLog():
         return 'AuditLog';
-      case _i7.AuthResponse():
+      case _i9.AuthResponse():
         return 'AuthResponse';
-      case _i8.Certificate():
+      case _i10.Certificate():
         return 'Certificate';
-      case _i9.DashboardStats():
+      case _i11.DashboardStats():
         return 'DashboardStats';
-      case _i10.Dentist():
+      case _i12.Dentist():
         return 'Dentist';
-      case _i11.DentistStatus():
+      case _i13.DentistStatus():
         return 'DentistStatus';
-      case _i12.Patient():
+      case _i14.Patient():
         return 'Patient';
-      case _i13.Greeting():
+      case _i15.DentistDocument():
+        return 'DentistDocument';
+      case _i16.Greeting():
         return 'Greeting';
+      case _i17.Hospital():
+        return 'Hospital';
+      case _i18.Receptionist():
+        return 'Receptionist';
     }
     className = _i2.Protocol().getClassNameForObject(data);
     if (className != null) {
@@ -633,32 +1126,47 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName is! String) {
       return super.deserializeByClassName(data);
     }
+    if (dataClassName == 'Appointment') {
+      return deserialize<_i5.Appointment>(data['data']);
+    }
+    if (dataClassName == 'AppointmentStatus') {
+      return deserialize<_i6.AppointmentStatus>(data['data']);
+    }
     if (dataClassName == 'Admin') {
-      return deserialize<_i5.Admin>(data['data']);
+      return deserialize<_i7.Admin>(data['data']);
     }
     if (dataClassName == 'AuditLog') {
-      return deserialize<_i6.AuditLog>(data['data']);
+      return deserialize<_i8.AuditLog>(data['data']);
     }
     if (dataClassName == 'AuthResponse') {
-      return deserialize<_i7.AuthResponse>(data['data']);
+      return deserialize<_i9.AuthResponse>(data['data']);
     }
     if (dataClassName == 'Certificate') {
-      return deserialize<_i8.Certificate>(data['data']);
+      return deserialize<_i10.Certificate>(data['data']);
     }
     if (dataClassName == 'DashboardStats') {
-      return deserialize<_i9.DashboardStats>(data['data']);
+      return deserialize<_i11.DashboardStats>(data['data']);
     }
     if (dataClassName == 'Dentist') {
-      return deserialize<_i10.Dentist>(data['data']);
+      return deserialize<_i12.Dentist>(data['data']);
     }
     if (dataClassName == 'DentistStatus') {
-      return deserialize<_i11.DentistStatus>(data['data']);
+      return deserialize<_i13.DentistStatus>(data['data']);
     }
     if (dataClassName == 'Patient') {
-      return deserialize<_i12.Patient>(data['data']);
+      return deserialize<_i14.Patient>(data['data']);
+    }
+    if (dataClassName == 'DentistDocument') {
+      return deserialize<_i15.DentistDocument>(data['data']);
     }
     if (dataClassName == 'Greeting') {
-      return deserialize<_i13.Greeting>(data['data']);
+      return deserialize<_i16.Greeting>(data['data']);
+    }
+    if (dataClassName == 'Hospital') {
+      return deserialize<_i17.Hospital>(data['data']);
+    }
+    if (dataClassName == 'Receptionist') {
+      return deserialize<_i18.Receptionist>(data['data']);
     }
     if (dataClassName.startsWith('serverpod.')) {
       data['className'] = dataClassName.substring(10);
@@ -696,16 +1204,24 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
     switch (t) {
-      case _i5.Admin:
-        return _i5.Admin.t;
-      case _i6.AuditLog:
-        return _i6.AuditLog.t;
-      case _i8.Certificate:
-        return _i8.Certificate.t;
-      case _i10.Dentist:
-        return _i10.Dentist.t;
-      case _i12.Patient:
-        return _i12.Patient.t;
+      case _i5.Appointment:
+        return _i5.Appointment.t;
+      case _i7.Admin:
+        return _i7.Admin.t;
+      case _i8.AuditLog:
+        return _i8.AuditLog.t;
+      case _i10.Certificate:
+        return _i10.Certificate.t;
+      case _i12.Dentist:
+        return _i12.Dentist.t;
+      case _i14.Patient:
+        return _i14.Patient.t;
+      case _i15.DentistDocument:
+        return _i15.DentistDocument.t;
+      case _i17.Hospital:
+        return _i17.Hospital.t;
+      case _i18.Receptionist:
+        return _i18.Receptionist.t;
     }
     return null;
   }

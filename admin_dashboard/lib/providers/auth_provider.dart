@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dental_client/dental_client.dart';
 import '../services/serverpod_client.dart';
+import '../services/token_storage_service.dart';
 
 class AuthProvider extends ChangeNotifier {
   Admin? _currentAdmin;
@@ -15,10 +16,18 @@ class AuthProvider extends ChangeNotifier {
   Future<bool> login(String email, String password) async {
     _setLoading(true);
     try {
-      final admin = await client.auth.adminLogin(email, password);
-      if (admin != null) {
-        _currentAdmin = admin;
+      final authResponse = await client.auth.adminLogin(email, password);
+      if (authResponse.admin != null) {
+        _currentAdmin = authResponse.admin!;
         _errorMessage = null;
+        
+        final TokenStorageService tokenStorage = TokenStorageService();
+        await tokenStorage.saveTokens(
+          accessToken: authResponse.token!,
+          refreshToken: authResponse.refreshToken!,
+          adminId: authResponse.admin!.id,
+        );
+        
         notifyListeners();
         return true;
       } else {
@@ -33,9 +42,18 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  void logout() {
-    _currentAdmin = null;
-    notifyListeners();
+  Future<void> logout() async {
+    try {
+      if (_currentAdmin != null) {
+        await client.auth.adminLogout(_currentAdmin!.id!);
+      }
+    } catch (e) {
+      debugPrint('Logout error: $e');
+    } finally {
+      _currentAdmin = null;
+      await TokenStorageService().clearTokens();
+      notifyListeners();
+    }
   }
 
   void _setLoading(bool value) {

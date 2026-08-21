@@ -13,12 +13,17 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../auth/email_idp_endpoint.dart' as _i2;
 import '../auth/jwt_refresh_endpoint.dart' as _i3;
-import '../endpoints/auth_endpoint.dart' as _i4;
-import '../greetings/greeting_endpoint.dart' as _i5;
+import '../endpoints/appointment_endpoint.dart' as _i4;
+import '../endpoints/auth_endpoint.dart' as _i5;
+import '../endpoints/document_endpoint.dart' as _i6;
+import '../endpoints/hospital_endpoint.dart' as _i7;
+import '../endpoints/receptionist_endpoint.dart' as _i8;
+import '../greetings/greeting_endpoint.dart' as _i9;
+import 'package:dental_server/src/generated/hospital/hospital.dart' as _i10;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
-    as _i6;
+    as _i11;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
-    as _i7;
+    as _i12;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -36,13 +41,37 @@ class Endpoints extends _i1.EndpointDispatch {
           'jwtRefresh',
           null,
         ),
-      'auth': _i4.AuthEndpoint()
+      'appointment': _i4.AppointmentEndpoint()
+        ..initialize(
+          server,
+          'appointment',
+          null,
+        ),
+      'auth': _i5.AuthEndpoint()
         ..initialize(
           server,
           'auth',
           null,
         ),
-      'greeting': _i5.GreetingEndpoint()
+      'document': _i6.DocumentEndpoint()
+        ..initialize(
+          server,
+          'document',
+          null,
+        ),
+      'hospital': _i7.HospitalEndpoint()
+        ..initialize(
+          server,
+          'hospital',
+          null,
+        ),
+      'receptionist': _i8.ReceptionistEndpoint()
+        ..initialize(
+          server,
+          'receptionist',
+          null,
+        ),
+      'greeting': _i9.GreetingEndpoint()
         ..initialize(
           server,
           'greeting',
@@ -253,6 +282,158 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
+    connectors['appointment'] = _i1.EndpointConnector(
+      name: 'appointment',
+      endpoint: endpoints['appointment']!,
+      methodConnectors: {
+        'createAppointment': _i1.MethodConnector(
+          name: 'createAppointment',
+          params: {
+            'hospitalId': _i1.ParameterDescription(
+              name: 'hospitalId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'date': _i1.ParameterDescription(
+              name: 'date',
+              type: _i1.getType<DateTime>(),
+              nullable: false,
+            ),
+            'startTime': _i1.ParameterDescription(
+              name: 'startTime',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'endTime': _i1.ParameterDescription(
+              name: 'endTime',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'reason': _i1.ParameterDescription(
+              name: 'reason',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['appointment'] as _i4.AppointmentEndpoint)
+                  .createAppointment(
+                    session,
+                    params['hospitalId'],
+                    params['date'],
+                    params['startTime'],
+                    params['endTime'],
+                    params['reason'],
+                  ),
+        ),
+        'getPatientAppointments': _i1.MethodConnector(
+          name: 'getPatientAppointments',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['appointment'] as _i4.AppointmentEndpoint)
+                  .getPatientAppointments(session),
+        ),
+        'cancelPatientAppointment': _i1.MethodConnector(
+          name: 'cancelPatientAppointment',
+          params: {
+            'appointmentId': _i1.ParameterDescription(
+              name: 'appointmentId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['appointment'] as _i4.AppointmentEndpoint)
+                  .cancelPatientAppointment(
+                    session,
+                    params['appointmentId'],
+                  ),
+        ),
+        'getHospitalAppointments': _i1.MethodConnector(
+          name: 'getHospitalAppointments',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['appointment'] as _i4.AppointmentEndpoint)
+                  .getHospitalAppointments(session),
+        ),
+        'getHospitalAppointmentDetails': _i1.MethodConnector(
+          name: 'getHospitalAppointmentDetails',
+          params: {
+            'appointmentId': _i1.ParameterDescription(
+              name: 'appointmentId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['appointment'] as _i4.AppointmentEndpoint)
+                  .getHospitalAppointmentDetails(
+                    session,
+                    params['appointmentId'],
+                  ),
+        ),
+        'getAvailableDentistsForAppointment': _i1.MethodConnector(
+          name: 'getAvailableDentistsForAppointment',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['appointment'] as _i4.AppointmentEndpoint)
+                  .getAvailableDentistsForAppointment(session),
+        ),
+        'allocateDentist': _i1.MethodConnector(
+          name: 'allocateDentist',
+          params: {
+            'appointmentId': _i1.ParameterDescription(
+              name: 'appointmentId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'dentistId': _i1.ParameterDescription(
+              name: 'dentistId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['appointment'] as _i4.AppointmentEndpoint)
+                  .allocateDentist(
+                    session,
+                    params['appointmentId'],
+                    params['dentistId'],
+                  ),
+        ),
+        'getDentistAppointments': _i1.MethodConnector(
+          name: 'getDentistAppointments',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['appointment'] as _i4.AppointmentEndpoint)
+                  .getDentistAppointments(session),
+        ),
+      },
+    );
     connectors['auth'] = _i1.EndpointConnector(
       name: 'auth',
       endpoint: endpoints['auth']!,
@@ -286,7 +467,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['auth'] as _i4.AuthEndpoint).patientRegister(
+                  (endpoints['auth'] as _i5.AuthEndpoint).patientRegister(
                     session,
                     params['fullName'],
                     params['email'],
@@ -312,7 +493,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint).patientLogin(
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint).patientLogin(
                 session,
                 params['email'],
                 params['password'],
@@ -331,7 +512,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint).patientLogout(
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint).patientLogout(
                 session,
                 params['patientId'],
               ),
@@ -350,7 +531,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['auth'] as _i4.AuthEndpoint).patientRefreshToken(
+                  (endpoints['auth'] as _i5.AuthEndpoint).patientRefreshToken(
                     session,
                     params['refreshToken'],
                   ),
@@ -444,7 +625,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['auth'] as _i4.AuthEndpoint).dentistRegister(
+                  (endpoints['auth'] as _i5.AuthEndpoint).dentistRegister(
                     session,
                     params['fullName'],
                     params['email'],
@@ -482,10 +663,28 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint).dentistLogin(
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint).dentistLogin(
                 session,
                 params['email'],
                 params['password'],
+              ),
+        ),
+        'dentistLogout': _i1.MethodConnector(
+          name: 'dentistLogout',
+          params: {
+            'dentistId': _i1.ParameterDescription(
+              name: 'dentistId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint).dentistLogout(
+                session,
+                params['dentistId'],
               ),
         ),
         'adminLogin': _i1.MethodConnector(
@@ -506,11 +705,48 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint).adminLogin(
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint).adminLogin(
                 session,
                 params['email'],
                 params['password'],
               ),
+        ),
+        'adminLogout': _i1.MethodConnector(
+          name: 'adminLogout',
+          params: {
+            'adminId': _i1.ParameterDescription(
+              name: 'adminId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint).adminLogout(
+                session,
+                params['adminId'],
+              ),
+        ),
+        'refreshAuthToken': _i1.MethodConnector(
+          name: 'refreshAuthToken',
+          params: {
+            'refreshToken': _i1.ParameterDescription(
+              name: 'refreshToken',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['auth'] as _i5.AuthEndpoint).refreshAuthToken(
+                    session,
+                    params['refreshToken'],
+                  ),
         ),
         'getPendingDentists': _i1.MethodConnector(
           name: 'getPendingDentists',
@@ -519,7 +755,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint)
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint)
                   .getPendingDentists(session),
         ),
         'approveDentist': _i1.MethodConnector(
@@ -540,7 +776,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint).approveDentist(
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint).approveDentist(
                 session,
                 params['dentistId'],
                 adminEmail: params['adminEmail'],
@@ -569,7 +805,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint).rejectDentist(
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint).rejectDentist(
                 session,
                 params['dentistId'],
                 adminEmail: params['adminEmail'],
@@ -604,7 +840,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint).suspendDentist(
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint).suspendDentist(
                 session,
                 params['dentistId'],
                 params['endsAt'],
@@ -636,7 +872,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['auth'] as _i4.AuthEndpoint).terminateDentist(
+                  (endpoints['auth'] as _i5.AuthEndpoint).terminateDentist(
                     session,
                     params['dentistId'],
                     params['reason'],
@@ -657,7 +893,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['auth'] as _i4.AuthEndpoint).getDentistAuditLogs(
+                  (endpoints['auth'] as _i5.AuthEndpoint).getDentistAuditLogs(
                     session,
                     params['dentistId'],
                   ),
@@ -680,7 +916,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint).logPdfDownload(
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint).logPdfDownload(
                 session,
                 params['dentistId'],
                 adminEmail: params['adminEmail'],
@@ -700,7 +936,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['auth'] as _i4.AuthEndpoint).searchDentistByCode(
+                  (endpoints['auth'] as _i5.AuthEndpoint).searchDentistByCode(
                     session,
                     params['code'],
                   ),
@@ -712,7 +948,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint)
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint)
                   .getDashboardStats(session),
         ),
         'getAllPatients': _i1.MethodConnector(
@@ -722,7 +958,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint).getAllPatients(
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint).getAllPatients(
                 session,
               ),
         ),
@@ -733,7 +969,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint).getAllDentists(
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint).getAllDentists(
                 session,
               ),
         ),
@@ -744,7 +980,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint)
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint)
                   .getApprovedDentists(session),
         ),
         'getRejectedDentists': _i1.MethodConnector(
@@ -754,7 +990,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint)
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint)
                   .getRejectedDentists(session),
         ),
         'getSuspendedDentists': _i1.MethodConnector(
@@ -764,7 +1000,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint)
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint)
                   .getSuspendedDentists(session),
         ),
         'getTerminatedDentists': _i1.MethodConnector(
@@ -774,8 +1010,355 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['auth'] as _i4.AuthEndpoint)
+              ) async => (endpoints['auth'] as _i5.AuthEndpoint)
                   .getTerminatedDentists(session),
+        ),
+      },
+    );
+    connectors['document'] = _i1.EndpointConnector(
+      name: 'document',
+      endpoint: endpoints['document']!,
+      methodConnectors: {
+        'getDentistDocuments': _i1.MethodConnector(
+          name: 'getDentistDocuments',
+          params: {
+            'dentistId': _i1.ParameterDescription(
+              name: 'dentistId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['document'] as _i6.DocumentEndpoint)
+                  .getDentistDocuments(
+                    session,
+                    params['dentistId'],
+                  ),
+        ),
+        'downloadDocument': _i1.MethodConnector(
+          name: 'downloadDocument',
+          params: {
+            'documentId': _i1.ParameterDescription(
+              name: 'documentId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['document'] as _i6.DocumentEndpoint)
+                  .downloadDocument(
+                    session,
+                    params['documentId'],
+                  ),
+        ),
+      },
+    );
+    connectors['hospital'] = _i1.EndpointConnector(
+      name: 'hospital',
+      endpoint: endpoints['hospital']!,
+      methodConnectors: {
+        'createHospital': _i1.MethodConnector(
+          name: 'createHospital',
+          params: {
+            'name': _i1.ParameterDescription(
+              name: 'name',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'address': _i1.ParameterDescription(
+              name: 'address',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'phone': _i1.ParameterDescription(
+              name: 'phone',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'email': _i1.ParameterDescription(
+              name: 'email',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['hospital'] as _i7.HospitalEndpoint)
+                  .createHospital(
+                    session,
+                    params['name'],
+                    params['address'],
+                    params['phone'],
+                    params['email'],
+                  ),
+        ),
+        'getHospital': _i1.MethodConnector(
+          name: 'getHospital',
+          params: {
+            'id': _i1.ParameterDescription(
+              name: 'id',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async =>
+                  (endpoints['hospital'] as _i7.HospitalEndpoint).getHospital(
+                    session,
+                    params['id'],
+                  ),
+        ),
+        'listActiveHospitals': _i1.MethodConnector(
+          name: 'listActiveHospitals',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['hospital'] as _i7.HospitalEndpoint)
+                  .listActiveHospitals(session),
+        ),
+        'updateHospital': _i1.MethodConnector(
+          name: 'updateHospital',
+          params: {
+            'hospital': _i1.ParameterDescription(
+              name: 'hospital',
+              type: _i1.getType<_i10.Hospital>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['hospital'] as _i7.HospitalEndpoint)
+                  .updateHospital(
+                    session,
+                    params['hospital'],
+                  ),
+        ),
+      },
+    );
+    connectors['receptionist'] = _i1.EndpointConnector(
+      name: 'receptionist',
+      endpoint: endpoints['receptionist']!,
+      methodConnectors: {
+        'receptionistLogin': _i1.MethodConnector(
+          name: 'receptionistLogin',
+          params: {
+            'email': _i1.ParameterDescription(
+              name: 'email',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'password': _i1.ParameterDescription(
+              name: 'password',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['receptionist'] as _i8.ReceptionistEndpoint)
+                  .receptionistLogin(
+                    session,
+                    params['email'],
+                    params['password'],
+                  ),
+        ),
+        'receptionistLogout': _i1.MethodConnector(
+          name: 'receptionistLogout',
+          params: {
+            'receptionistId': _i1.ParameterDescription(
+              name: 'receptionistId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['receptionist'] as _i8.ReceptionistEndpoint)
+                  .receptionistLogout(
+                    session,
+                    params['receptionistId'],
+                  ),
+        ),
+        'createReceptionist': _i1.MethodConnector(
+          name: 'createReceptionist',
+          params: {
+            'hospitalId': _i1.ParameterDescription(
+              name: 'hospitalId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'fullName': _i1.ParameterDescription(
+              name: 'fullName',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'email': _i1.ParameterDescription(
+              name: 'email',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'phone': _i1.ParameterDescription(
+              name: 'phone',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'password': _i1.ParameterDescription(
+              name: 'password',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['receptionist'] as _i8.ReceptionistEndpoint)
+                  .createReceptionist(
+                    session,
+                    params['hospitalId'],
+                    params['fullName'],
+                    params['email'],
+                    params['phone'],
+                    params['password'],
+                  ),
+        ),
+        'receptionistRegisterDentist': _i1.MethodConnector(
+          name: 'receptionistRegisterDentist',
+          params: {
+            'fullName': _i1.ParameterDescription(
+              name: 'fullName',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'email': _i1.ParameterDescription(
+              name: 'email',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'phone': _i1.ParameterDescription(
+              name: 'phone',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'password': _i1.ParameterDescription(
+              name: 'password',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'dateOfBirth': _i1.ParameterDescription(
+              name: 'dateOfBirth',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'licenseNumber': _i1.ParameterDescription(
+              name: 'licenseNumber',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'specialization': _i1.ParameterDescription(
+              name: 'specialization',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'qualification': _i1.ParameterDescription(
+              name: 'qualification',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'experience': _i1.ParameterDescription(
+              name: 'experience',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'clinicName': _i1.ParameterDescription(
+              name: 'clinicName',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'clinicAddress': _i1.ParameterDescription(
+              name: 'clinicAddress',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'profilePhotoUrl': _i1.ParameterDescription(
+              name: 'profilePhotoUrl',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'registrationFileUrl': _i1.ParameterDescription(
+              name: 'registrationFileUrl',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'degreeFileUrl': _i1.ParameterDescription(
+              name: 'degreeFileUrl',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'idFileUrl': _i1.ParameterDescription(
+              name: 'idFileUrl',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
+            'isTermsAccepted': _i1.ParameterDescription(
+              name: 'isTermsAccepted',
+              type: _i1.getType<bool>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['receptionist'] as _i8.ReceptionistEndpoint)
+                  .receptionistRegisterDentist(
+                    session,
+                    params['fullName'],
+                    params['email'],
+                    params['phone'],
+                    params['password'],
+                    params['dateOfBirth'],
+                    params['licenseNumber'],
+                    params['specialization'],
+                    params['qualification'],
+                    params['experience'],
+                    params['clinicName'],
+                    params['clinicAddress'],
+                    params['profilePhotoUrl'],
+                    params['registrationFileUrl'],
+                    params['degreeFileUrl'],
+                    params['idFileUrl'],
+                    params['isTermsAccepted'],
+                  ),
+        ),
+        'getDentistsForHospital': _i1.MethodConnector(
+          name: 'getDentistsForHospital',
+          params: {},
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['receptionist'] as _i8.ReceptionistEndpoint)
+                  .getDentistsForHospital(session),
         ),
       },
     );
@@ -796,16 +1379,16 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['greeting'] as _i5.GreetingEndpoint).hello(
+              ) async => (endpoints['greeting'] as _i9.GreetingEndpoint).hello(
                 session,
                 params['name'],
               ),
         ),
       },
     );
-    modules['serverpod_auth_idp'] = _i6.Endpoints()
+    modules['serverpod_auth_idp'] = _i11.Endpoints()
       ..initializeEndpoints(server);
-    modules['serverpod_auth_core'] = _i7.Endpoints()
+    modules['serverpod_auth_core'] = _i12.Endpoints()
       ..initializeEndpoints(server);
   }
 }

@@ -1,0 +1,7 @@
+enum: AppointmentStatus
+values:
+  - pending
+  - accepted
+  - rejected
+  - cancelled
+  - completed

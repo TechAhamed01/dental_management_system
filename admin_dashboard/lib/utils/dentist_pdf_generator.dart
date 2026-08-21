@@ -8,6 +8,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:syncfusion_flutter_pdf/pdf.dart' as sf;
 import 'package:dental_client/dental_client.dart';
 import '../providers/dashboard_provider.dart';
+import '../services/serverpod_client.dart';
 
 class _ParsedDoc {
   final String title;
@@ -44,7 +45,7 @@ String _cleanText(String? text) {
       .replaceAll(RegExp(r'[^\x20-\x7E\r\n\t]'), '');
 }
 
-_ParsedDoc _parseDocument(String title, String? rawData) {
+Future<_ParsedDoc> _parseDocument(String title, String? rawData) async {
   if (rawData == null || rawData.isEmpty) {
     return _ParsedDoc(
       title: title,
@@ -56,8 +57,24 @@ _ParsedDoc _parseDocument(String title, String? rawData) {
 
   String fileName = 'Document';
   String? dataUrl;
+  Uint8List? rawBytes;
 
-  if (rawData.contains('|data:')) {
+  if (rawData.startsWith('[SECURE_DOCUMENT:')) {
+    try {
+      final endIndex = rawData.indexOf(']');
+      if (endIndex != -1) {
+        final idStr = rawData.substring(17, endIndex);
+        final docId = int.parse(idStr);
+        final byteData = await client.document.downloadDocument(docId);
+        if (byteData != null) {
+          rawBytes = byteData.buffer.asUint8List();
+          fileName = '$title (Secure Document)';
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching secure document for PDF: $e');
+    }
+  } else if (rawData.contains('|data:')) {
     final parts = rawData.split('|data:');
     fileName = parts[0];
     dataUrl = 'data:${parts[1]}';
@@ -73,7 +90,20 @@ _ParsedDoc _parseDocument(String title, String? rawData) {
   Uint8List? pdfBytes;
   bool isPdf = false;
 
-  if (dataUrl != null) {
+  if (rawBytes != null) {
+    if (rawBytes.length >= 4 &&
+        rawBytes[0] == 0x25 &&
+        rawBytes[1] == 0x50 &&
+        rawBytes[2] == 0x44 &&
+        rawBytes[3] == 0x46) {
+      isPdf = true;
+      pdfBytes = rawBytes;
+      fileName = '$title File.pdf';
+    } else if (rawBytes.length >= 4) {
+      imageBytes = rawBytes;
+      fileName = '$title File.png';
+    }
+  } else if (dataUrl != null) {
     if (dataUrl.startsWith('data:image/')) {
       try {
         final base64Part = dataUrl.split(',').last;
@@ -136,7 +166,7 @@ _ParsedDoc _parseDocument(String title, String? rawData) {
   return _ParsedDoc(
     title: title,
     fileName: _cleanText(fileName),
-    isUploaded: true,
+    isUploaded: rawBytes != null || dataUrl != null || imageBytes != null || pdfBytes != null,
     isPdf: isPdf,
     imageBytes: imageBytes,
     pdfBytes: pdfBytes,
@@ -169,9 +199,9 @@ Future<void> generateAndDownloadDentistPdf(BuildContext context, Dentist dentist
     final pdf = pw.Document();
 
     final parsedDocs = [
-      _parseDocument('Medical Registration Certificate', dentist.registrationFileUrl),
-      _parseDocument('Degree Certificate', dentist.degreeFileUrl),
-      _parseDocument('Government ID', dentist.idFileUrl),
+      await _parseDocument('Medical Registration Certificate', dentist.registrationFileUrl),
+      await _parseDocument('Degree Certificate', dentist.degreeFileUrl),
+      await _parseDocument('Government ID', dentist.idFileUrl),
     ];
 
     final primaryColor = PdfColor.fromHex('#1E3A8A'); // Deep Blue

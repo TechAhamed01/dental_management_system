@@ -9,6 +9,15 @@ emailIdp:
   - hasAccount:
 jwtRefresh:
   - refreshAccessToken:
+appointment:
+  - createAppointment:
+  - getPatientAppointments:
+  - cancelPatientAppointment:
+  - getHospitalAppointments:
+  - getHospitalAppointmentDetails:
+  - getAvailableDentistsForAppointment:
+  - allocateDentist:
+  - getDentistAppointments:
 auth:
   - patientRegister:
   - patientLogin:
@@ -16,7 +25,10 @@ auth:
   - patientRefreshToken:
   - dentistRegister:
   - dentistLogin:
+  - dentistLogout:
   - adminLogin:
+  - adminLogout:
+  - refreshAuthToken:
   - getPendingDentists:
   - approveDentist:
   - rejectDentist:
@@ -32,5 +44,19 @@ auth:
   - getRejectedDentists:
   - getSuspendedDentists:
   - getTerminatedDentists:
+document:
+  - getDentistDocuments:
+  - downloadDocument:
+hospital:
+  - createHospital:
+  - getHospital:
+  - listActiveHospitals:
+  - updateHospital:
+receptionist:
+  - receptionistLogin:
+  - receptionistLogout:
+  - createReceptionist:
+  - receptionistRegisterDentist:
+  - getDentistsForHospital:
 greeting:
   - hello:

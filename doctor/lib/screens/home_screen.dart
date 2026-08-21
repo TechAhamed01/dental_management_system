@@ -4,6 +4,8 @@ import 'package:dental_client/dental_client.dart' as dc;
 
 import '../controllers/login_controller.dart';
 import 'doctor_login.dart';
+import '../features/appointments/screens/dentist_appointments_screen.dart';
+import '../features/appointments/providers/dentist_appointments_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   final dc.Dentist? dentist;
@@ -20,6 +22,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
 
   int currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DentistAppointmentsProvider>().fetchAppointments();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,32 +178,49 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Expanded(
-                      child: _dashboardCard(
-                        title: "Today's\nPatients",
-                        value: "18",
-                        icon: Icons.people_alt_outlined,
-                        iconColor: const Color(0xff4F7DF3),
-                        iconBackground: const Color(0xffEAF2FF),
+                      child: Consumer<DentistAppointmentsProvider>(
+                        builder: (context, provider, child) => _dashboardCard(
+                          title: "Today's\nPatients",
+                          value: provider.todaysAppointments.length.toString(),
+                          icon: Icons.people_alt_outlined,
+                          iconColor: const Color(0xff4F7DF3),
+                          iconBackground: const Color(0xffEAF2FF),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 15),
                     Expanded(
-                      child: _dashboardCard(
-                        title: "Appointments",
-                        value: "12",
-                        icon: Icons.calendar_today_outlined,
-                        iconColor: Colors.green,
-                        iconBackground: const Color(0xffEAFBF1),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const DentistAppointmentsScreen(),
+                            ),
+                          );
+                        },
+                        child: _dashboardCard(
+                          title: "Appointments",
+                          value: "View",
+                          icon: Icons.calendar_today_outlined,
+                          iconColor: Colors.green,
+                          iconBackground: const Color(0xffEAFBF1),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 15),
                     Expanded(
-                      child: _dashboardCard(
-                        title: "Pending",
-                        value: "05",
-                        icon: Icons.schedule,
-                        iconColor: Colors.orange,
-                        iconBackground: const Color(0xffFFF4E5),
+                      child: Consumer<DentistAppointmentsProvider>(
+                        builder: (context, provider, child) {
+                          int pendingCount = provider.appointments.where((a) => a.status.name == 'pending').length;
+                          return _dashboardCard(
+                            title: "Pending",
+                            value: pendingCount.toString(),
+                            icon: Icons.schedule,
+                            iconColor: Colors.orange,
+                            iconBackground: const Color(0xffFFF4E5),
+                          );
+                        }
                       ),
                     ),
                   ],
@@ -224,35 +251,39 @@ Row(
 
 const SizedBox(height: 20),
 
-_buildAppointmentCard(
-  patient: "John Doe",
-  treatment: "Root Canal",
-  time: "09:30 AM",
-  status: "Confirmed",
-  statusColor: Colors.green,
+Consumer<DentistAppointmentsProvider>(
+  builder: (context, provider, child) {
+    if (provider.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (provider.todaysAppointments.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 20),
+        child: Center(
+          child: Text('No appointments today.', style: TextStyle(color: Colors.grey)),
+        ),
+      );
+    }
+    
+    return Column(
+      children: provider.todaysAppointments.map((apt) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 15),
+          child: _buildAppointmentCard(
+            patient: apt.patient?.fullName ?? "Unknown",
+            treatment: apt.reason,
+            time: apt.startTime,
+            status: apt.status.name.toUpperCase(),
+            statusColor: apt.status.name == 'accepted' ? Colors.green : Colors.orange,
+          ),
+        );
+      }).toList(),
+    );
+  }
 ),
 
-const SizedBox(height: 15),
+const SizedBox(height: 30),
 
-_buildAppointmentCard(
-  patient: "Emily Watson",
-  treatment: "Teeth Cleaning",
-  time: "11:00 AM",
-  status: "Pending",
-  statusColor: Colors.orange,
-),
-
-const SizedBox(height: 15),
-
-_buildAppointmentCard(
-  patient: "Michael Brown",
-  treatment: "Dental Implant",
-  time: "02:00 PM",
-  status: "Upcoming",
-  statusColor: Colors.blue,
-),
-
-const SizedBox(height: 25),
             ],
           ),
         ),

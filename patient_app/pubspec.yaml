@@ -19,6 +19,7 @@ dependencies:
   flutter_secure_storage: ^10.0.0
   dental_client:
     path: ../dental/dental_client
+  intl: ^0.20.3
 
 dev_dependencies:
   flutter_test:

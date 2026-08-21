@@ -8,6 +8,7 @@ import 'package:dental_client/dental_client.dart';
 import '../providers/dashboard_provider.dart';
 import 'theme.dart';
 import 'dentist_pdf_generator.dart';
+import '../services/serverpod_client.dart';
 
 void showDentistDetailsDialog(
   BuildContext context,
@@ -49,7 +50,7 @@ void showDentistDetailsDialog(
                                 ),
                           ),
                           Text(
-                            '${dentist.specialization} • ${dentist.clinicName}',
+                            '${dentist.specialization} • ${dentist.hospital != null ? dentist.hospital!.name : dentist.clinicName}',
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                   color: AppTheme.textSecondary,
                                 ),
@@ -150,7 +151,7 @@ void showDentistDetailsDialog(
                             _buildDetailItem('Specialization', dentist.specialization),
                             _buildDetailItem('Qualification', dentist.qualification ?? 'Not provided'),
                             _buildDetailItem('Experience', '${dentist.experience} years'),
-                            _buildDetailItem('Clinic / Hospital', dentist.clinicName),
+                            _buildDetailItem('Clinic / Hospital', dentist.hospital != null ? dentist.hospital!.name : dentist.clinicName),
                             _buildDetailItem('Clinic Address', dentist.clinicAddress),
                           ],
                         ),
@@ -390,6 +391,26 @@ Widget _buildDocumentCard(BuildContext context, String title, String? rawData) {
     );
   }
 
+  // Handle new Secure Documents
+  if (rawData.startsWith('[SECURE_DOCUMENT:')) {
+    final docIdStr = rawData.substring(17, rawData.length - 1);
+    final docId = int.tryParse(docIdStr);
+    
+    if (docId == null) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.red.shade50,
+          border: Border.all(color: Colors.red.shade200),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text('Error: Invalid secure document reference.', style: TextStyle(color: Colors.red.shade900)),
+      );
+    }
+    
+    return _SecureDocumentWidget(title: title, documentId: docId);
+  }
+
   String fileName = 'Document';
   String? dataUrl;
 
@@ -620,6 +641,128 @@ Widget _buildDocumentCard(BuildContext context, String title, String? rawData) {
     ),
   );
 }
+
+class _SecureDocumentWidget extends StatefulWidget {
+  final String title;
+  final int documentId;
+
+  const _SecureDocumentWidget({required this.title, required this.documentId});
+
+  @override
+  State<_SecureDocumentWidget> createState() => _SecureDocumentWidgetState();
+}
+
+class _SecureDocumentWidgetState extends State<_SecureDocumentWidget> {
+  bool _isLoading = false;
+  String? _error;
+  Uint8List? _bytes;
+  bool _isPdf = false;
+
+  Future<void> _fetchDocument() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final byteData = await client.document.downloadDocument(widget.documentId);
+      
+      if (byteData == null) {
+        setState(() {
+          _error = 'Document not found on server.';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      final uint8List = byteData.buffer.asUint8List();
+      
+      bool isPdf = false;
+      if (uint8List.length >= 4 &&
+          uint8List[0] == 0x25 &&
+          uint8List[1] == 0x50 &&
+          uint8List[2] == 0x44 &&
+          uint8List[3] == 0x46) {
+        isPdf = true;
+      }
+
+      setState(() {
+        _bytes = uint8List;
+        _isPdf = isPdf;
+        _isLoading = false;
+      });
+
+      if (mounted) {
+        if (isPdf) {
+          _showFullscreenPdf(context, uint8List, null, 'Document.pdf', widget.title);
+        } else {
+          _showFullscreenImage(context, uint8List, widget.title);
+        }
+      }
+    } catch (e) {
+      setState(() {
+        _error = e.toString().replaceAll('Exception: ', '');
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.lock_outline, color: AppTheme.primaryColor, size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.title,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  _error ?? 'Secure Document Vault (ID: ${widget.documentId})',
+                  style: TextStyle(
+                    color: _error != null ? Colors.red : AppTheme.textSecondary,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (_isLoading)
+            const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          else
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+              icon: const Icon(Icons.download, size: 16),
+              label: Text(_bytes == null ? 'Fetch Secure Document' : 'View Again'),
+              onPressed: _fetchDocument,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 
 void _showFullscreenImage(BuildContext context, Uint8List bytes, String title) {
   showDialog(

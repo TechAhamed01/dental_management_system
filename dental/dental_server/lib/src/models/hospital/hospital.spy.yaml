@@ -1,0 +1,9 @@
+class: Hospital
+table: hospital
+fields:
+  name: String
+  address: String
+  phone: String
+  email: String
+  isActive: bool
+  createdAt: DateTime

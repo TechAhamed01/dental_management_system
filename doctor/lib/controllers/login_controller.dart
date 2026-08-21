@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:dental_client/dental_client.dart' as dc;
 import '../repositories/auth_repository.dart';
+import '../services/token_storage_service.dart';
+import '../services/serverpod_client.dart';
 
 class LoginController extends ChangeNotifier {
   final AuthRepository _authRepository = AuthRepository();
+  final TokenStorageService _tokenStorage = TokenStorageService();
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -20,15 +23,20 @@ class LoginController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final dentist = await _authRepository.login(email, password);
-      debugPrint("[LoginController] API response received: $dentist");
-      if (dentist != null) {
-        debugPrint("[LoginController] Dentist status received: ${dentist.status}");
-        _currentDentist = dentist;
+      final authResponse = await _authRepository.login(email, password);
+      debugPrint("[LoginController] API response received: $authResponse");
+      if (authResponse.dentist != null) {
+        debugPrint("[LoginController] Dentist status received: ${authResponse.dentist!.status}");
+        _currentDentist = authResponse.dentist!;
+        await _tokenStorage.saveTokens(
+          accessToken: authResponse.token!,
+          refreshToken: authResponse.refreshToken!,
+          dentistId: authResponse.dentist!.id,
+        );
       } else {
         _errorMessage = "Invalid credentials or no response from server.";
       }
-      return dentist;
+      return authResponse.dentist;
     } catch (e) {
       debugPrint("[LoginController] Exceptions during login: $e");
       _errorMessage = _parseError(e);
@@ -39,9 +47,18 @@ class LoginController extends ChangeNotifier {
     }
   }
 
-  void logout() {
-    _currentDentist = null;
-    notifyListeners();
+  Future<void> logout() async {
+    try {
+      if (_currentDentist != null) {
+        await client.auth.dentistLogout(_currentDentist!.id!);
+      }
+    } catch (e) {
+      debugPrint('Logout error: $e');
+    } finally {
+      _currentDentist = null;
+      await _tokenStorage.clearTokens();
+      notifyListeners();
+    }
   }
 
   void clearError() {

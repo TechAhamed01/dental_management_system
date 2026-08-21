@@ -26,6 +26,8 @@ fields:
   terminatedAt: DateTime?
   terminationReason: String?
   terminatedBy: String?
+  hospitalId: int?
+  hospital: Hospital?, relation(field=hospitalId)
 indexes:
   dentist_code_idx:
     fields: dentistCode

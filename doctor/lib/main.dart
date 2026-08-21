@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'controllers/login_controller.dart';
 import 'screens/landing_page.dart';
+import 'features/appointments/providers/dentist_appointments_provider.dart';
 import 'services/serverpod_client.dart';
 
 void main() async {
@@ -18,6 +19,7 @@ class DentalCareApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LoginController()),
+        ChangeNotifierProvider(create: (_) => DentistAppointmentsProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

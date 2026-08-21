@@ -1,0 +1,16 @@
+class: DentistDocument
+table: dentist_document
+fields:
+  dentistId: int
+  dentist: Dentist?, relation(field=dentistId)
+  documentType: String
+  fileName: String
+  mimeType: String
+  storageKey: String
+  fileSize: int
+  uploadedAt: DateTime
+indexes:
+  dentist_document_dentist_id_idx:
+    fields: dentistId
+  dentist_document_type_idx:
+    fields: documentType

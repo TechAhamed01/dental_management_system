@@ -16,14 +16,19 @@ import 'package:serverpod_client/serverpod_client.dart' as _i2;
 import 'dart:async' as _i3;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i4;
-import 'package:dental_client/src/protocol/auth/auth_response.dart' as _i5;
+import 'package:dental_client/src/protocol/appointment/appointment.dart' as _i5;
 import 'package:dental_client/src/protocol/auth/dentist.dart' as _i6;
-import 'package:dental_client/src/protocol/auth/admin.dart' as _i7;
+import 'package:dental_client/src/protocol/auth/auth_response.dart' as _i7;
 import 'package:dental_client/src/protocol/auth/audit_log.dart' as _i8;
 import 'package:dental_client/src/protocol/auth/dashboard_stats.dart' as _i9;
 import 'package:dental_client/src/protocol/auth/patient.dart' as _i10;
-import 'package:dental_client/src/protocol/greetings/greeting.dart' as _i11;
-import 'protocol.dart' as _i12;
+import 'package:dental_client/src/protocol/dentist_document/dentist_document.dart'
+    as _i11;
+import 'dart:typed_data' as _i12;
+import 'package:dental_client/src/protocol/hospital/hospital.dart' as _i13;
+import 'package:dental_client/src/protocol/hospital/receptionist.dart' as _i14;
+import 'package:dental_client/src/protocol/greetings/greeting.dart' as _i15;
+import 'protocol.dart' as _i16;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -247,18 +252,107 @@ class EndpointJwtRefresh extends _i4.EndpointRefreshJwtTokens {
 }
 
 /// {@category Endpoint}
+class EndpointAppointment extends _i2.EndpointRef {
+  EndpointAppointment(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'appointment';
+
+  /// Creates a new appointment request from a Patient.
+  _i3.Future<_i5.Appointment> createAppointment(
+    int hospitalId,
+    DateTime date,
+    String startTime,
+    String endTime,
+    String reason,
+  ) => caller.callServerEndpoint<_i5.Appointment>(
+    'appointment',
+    'createAppointment',
+    {
+      'hospitalId': hospitalId,
+      'date': date,
+      'startTime': startTime,
+      'endTime': endTime,
+      'reason': reason,
+    },
+  );
+
+  /// Gets appointments for the authenticated patient
+  _i3.Future<List<_i5.Appointment>> getPatientAppointments() =>
+      caller.callServerEndpoint<List<_i5.Appointment>>(
+        'appointment',
+        'getPatientAppointments',
+        {},
+      );
+
+  /// Allows patient to cancel their pending appointment
+  _i3.Future<_i5.Appointment> cancelPatientAppointment(int appointmentId) =>
+      caller.callServerEndpoint<_i5.Appointment>(
+        'appointment',
+        'cancelPatientAppointment',
+        {'appointmentId': appointmentId},
+      );
+
+  /// Gets appointments for the authenticated receptionist's hospital
+  _i3.Future<List<_i5.Appointment>> getHospitalAppointments() =>
+      caller.callServerEndpoint<List<_i5.Appointment>>(
+        'appointment',
+        'getHospitalAppointments',
+        {},
+      );
+
+  /// Gets details of a specific hospital appointment
+  _i3.Future<_i5.Appointment?> getHospitalAppointmentDetails(
+    int appointmentId,
+  ) => caller.callServerEndpoint<_i5.Appointment?>(
+    'appointment',
+    'getHospitalAppointmentDetails',
+    {'appointmentId': appointmentId},
+  );
+
+  /// Gets available approved dentists for a specific appointment in the receptionist's hospital
+  _i3.Future<List<_i6.Dentist>> getAvailableDentistsForAppointment() =>
+      caller.callServerEndpoint<List<_i6.Dentist>>(
+        'appointment',
+        'getAvailableDentistsForAppointment',
+        {},
+      );
+
+  /// Allocates an approved dentist to a pending appointment
+  _i3.Future<_i5.Appointment> allocateDentist(
+    int appointmentId,
+    int dentistId,
+  ) => caller.callServerEndpoint<_i5.Appointment>(
+    'appointment',
+    'allocateDentist',
+    {
+      'appointmentId': appointmentId,
+      'dentistId': dentistId,
+    },
+  );
+
+  /// Gets appointments allocated to the authenticated dentist
+  _i3.Future<List<_i5.Appointment>> getDentistAppointments() =>
+      caller.callServerEndpoint<List<_i5.Appointment>>(
+        'appointment',
+        'getDentistAppointments',
+        {},
+      );
+}
+
+/// {@category Endpoint}
 class EndpointAuth extends _i2.EndpointRef {
   EndpointAuth(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'auth';
 
-  _i3.Future<_i5.AuthResponse> patientRegister(
+  _i3.Future<_i7.AuthResponse> patientRegister(
     String fullName,
     String email,
     String phone,
     String password,
-  ) => caller.callServerEndpoint<_i5.AuthResponse>(
+  ) => caller.callServerEndpoint<_i7.AuthResponse>(
     'auth',
     'patientRegister',
     {
@@ -269,10 +363,10 @@ class EndpointAuth extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i5.AuthResponse> patientLogin(
+  _i3.Future<_i7.AuthResponse> patientLogin(
     String email,
     String password,
-  ) => caller.callServerEndpoint<_i5.AuthResponse>(
+  ) => caller.callServerEndpoint<_i7.AuthResponse>(
     'auth',
     'patientLogin',
     {
@@ -288,8 +382,8 @@ class EndpointAuth extends _i2.EndpointRef {
         {'patientId': patientId},
       );
 
-  _i3.Future<_i5.AuthResponse> patientRefreshToken(String refreshToken) =>
-      caller.callServerEndpoint<_i5.AuthResponse>(
+  _i3.Future<_i7.AuthResponse> patientRefreshToken(String refreshToken) =>
+      caller.callServerEndpoint<_i7.AuthResponse>(
         'auth',
         'patientRefreshToken',
         {'refreshToken': refreshToken},
@@ -335,10 +429,10 @@ class EndpointAuth extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i6.Dentist?> dentistLogin(
+  _i3.Future<_i7.AuthResponse> dentistLogin(
     String email,
     String password,
-  ) => caller.callServerEndpoint<_i6.Dentist?>(
+  ) => caller.callServerEndpoint<_i7.AuthResponse>(
     'auth',
     'dentistLogin',
     {
@@ -347,10 +441,17 @@ class EndpointAuth extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i7.Admin?> adminLogin(
+  _i3.Future<void> dentistLogout(int dentistId) =>
+      caller.callServerEndpoint<void>(
+        'auth',
+        'dentistLogout',
+        {'dentistId': dentistId},
+      );
+
+  _i3.Future<_i7.AuthResponse> adminLogin(
     String email,
     String password,
-  ) => caller.callServerEndpoint<_i7.Admin?>(
+  ) => caller.callServerEndpoint<_i7.AuthResponse>(
     'auth',
     'adminLogin',
     {
@@ -358,6 +459,19 @@ class EndpointAuth extends _i2.EndpointRef {
       'password': password,
     },
   );
+
+  _i3.Future<void> adminLogout(int adminId) => caller.callServerEndpoint<void>(
+    'auth',
+    'adminLogout',
+    {'adminId': adminId},
+  );
+
+  _i3.Future<_i7.AuthResponse> refreshAuthToken(String refreshToken) =>
+      caller.callServerEndpoint<_i7.AuthResponse>(
+        'auth',
+        'refreshAuthToken',
+        {'refreshToken': refreshToken},
+      );
 
   _i3.Future<List<_i6.Dentist>> getPendingDentists() =>
       caller.callServerEndpoint<List<_i6.Dentist>>(
@@ -498,6 +612,171 @@ class EndpointAuth extends _i2.EndpointRef {
       );
 }
 
+/// {@category Endpoint}
+class EndpointDocument extends _i2.EndpointRef {
+  EndpointDocument(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'document';
+
+  /// Fetches the metadata of documents for a specific dentist.
+  /// Enforces authorization:
+  /// - Admin: All access
+  /// - Dentist: Only their own
+  /// - Receptionist: Only dentists in their hospital
+  _i3.Future<List<_i11.DentistDocument>> getDentistDocuments(int dentistId) =>
+      caller.callServerEndpoint<List<_i11.DentistDocument>>(
+        'document',
+        'getDentistDocuments',
+        {'dentistId': dentistId},
+      );
+
+  /// Securely downloads a document's binary data given its metadata ID.
+  _i3.Future<_i12.ByteData?> downloadDocument(int documentId) =>
+      caller.callServerEndpoint<_i12.ByteData?>(
+        'document',
+        'downloadDocument',
+        {'documentId': documentId},
+      );
+}
+
+/// {@category Endpoint}
+class EndpointHospital extends _i2.EndpointRef {
+  EndpointHospital(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'hospital';
+
+  _i3.Future<_i13.Hospital> createHospital(
+    String name,
+    String address,
+    String phone,
+    String email,
+  ) => caller.callServerEndpoint<_i13.Hospital>(
+    'hospital',
+    'createHospital',
+    {
+      'name': name,
+      'address': address,
+      'phone': phone,
+      'email': email,
+    },
+  );
+
+  _i3.Future<_i13.Hospital?> getHospital(int id) =>
+      caller.callServerEndpoint<_i13.Hospital?>(
+        'hospital',
+        'getHospital',
+        {'id': id},
+      );
+
+  _i3.Future<List<_i13.Hospital>> listActiveHospitals() =>
+      caller.callServerEndpoint<List<_i13.Hospital>>(
+        'hospital',
+        'listActiveHospitals',
+        {},
+      );
+
+  _i3.Future<_i13.Hospital> updateHospital(_i13.Hospital hospital) =>
+      caller.callServerEndpoint<_i13.Hospital>(
+        'hospital',
+        'updateHospital',
+        {'hospital': hospital},
+      );
+}
+
+/// {@category Endpoint}
+class EndpointReceptionist extends _i2.EndpointRef {
+  EndpointReceptionist(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'receptionist';
+
+  _i3.Future<_i7.AuthResponse> receptionistLogin(
+    String email,
+    String password,
+  ) => caller.callServerEndpoint<_i7.AuthResponse>(
+    'receptionist',
+    'receptionistLogin',
+    {
+      'email': email,
+      'password': password,
+    },
+  );
+
+  _i3.Future<void> receptionistLogout(int receptionistId) =>
+      caller.callServerEndpoint<void>(
+        'receptionist',
+        'receptionistLogout',
+        {'receptionistId': receptionistId},
+      );
+
+  _i3.Future<_i14.Receptionist> createReceptionist(
+    int hospitalId,
+    String fullName,
+    String email,
+    String phone,
+    String password,
+  ) => caller.callServerEndpoint<_i14.Receptionist>(
+    'receptionist',
+    'createReceptionist',
+    {
+      'hospitalId': hospitalId,
+      'fullName': fullName,
+      'email': email,
+      'phone': phone,
+      'password': password,
+    },
+  );
+
+  _i3.Future<_i6.Dentist?> receptionistRegisterDentist(
+    String fullName,
+    String email,
+    String phone,
+    String password,
+    String? dateOfBirth,
+    String licenseNumber,
+    String specialization,
+    String? qualification,
+    int experience,
+    String clinicName,
+    String clinicAddress,
+    String? profilePhotoUrl,
+    String? registrationFileUrl,
+    String? degreeFileUrl,
+    String? idFileUrl,
+    bool isTermsAccepted,
+  ) => caller.callServerEndpoint<_i6.Dentist?>(
+    'receptionist',
+    'receptionistRegisterDentist',
+    {
+      'fullName': fullName,
+      'email': email,
+      'phone': phone,
+      'password': password,
+      'dateOfBirth': dateOfBirth,
+      'licenseNumber': licenseNumber,
+      'specialization': specialization,
+      'qualification': qualification,
+      'experience': experience,
+      'clinicName': clinicName,
+      'clinicAddress': clinicAddress,
+      'profilePhotoUrl': profilePhotoUrl,
+      'registrationFileUrl': registrationFileUrl,
+      'degreeFileUrl': degreeFileUrl,
+      'idFileUrl': idFileUrl,
+      'isTermsAccepted': isTermsAccepted,
+    },
+  );
+
+  _i3.Future<List<_i6.Dentist>> getDentistsForHospital() =>
+      caller.callServerEndpoint<List<_i6.Dentist>>(
+        'receptionist',
+        'getDentistsForHospital',
+        {},
+      );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -508,8 +787,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i11.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i11.Greeting>(
+  _i3.Future<_i15.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i15.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -547,7 +826,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i12.Protocol(),
+         _i16.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -558,7 +837,11 @@ class Client extends _i2.ServerpodClientShared {
        ) {
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
+    appointment = EndpointAppointment(this);
     auth = EndpointAuth(this);
+    document = EndpointDocument(this);
+    hospital = EndpointHospital(this);
+    receptionist = EndpointReceptionist(this);
     greeting = EndpointGreeting(this);
     modules = Modules(this);
   }
@@ -567,7 +850,15 @@ class Client extends _i2.ServerpodClientShared {
 
   late final EndpointJwtRefresh jwtRefresh;
 
+  late final EndpointAppointment appointment;
+
   late final EndpointAuth auth;
+
+  late final EndpointDocument document;
+
+  late final EndpointHospital hospital;
+
+  late final EndpointReceptionist receptionist;
 
   late final EndpointGreeting greeting;
 
@@ -577,7 +868,11 @@ class Client extends _i2.ServerpodClientShared {
   Map<String, _i2.EndpointRef> get endpointRefLookup => {
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
+    'appointment': appointment,
     'auth': auth,
+    'document': document,
+    'hospital': hospital,
+    'receptionist': receptionist,
     'greeting': greeting,
   };
 

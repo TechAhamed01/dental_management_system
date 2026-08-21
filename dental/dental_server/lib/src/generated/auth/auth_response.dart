@@ -14,7 +14,8 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import '../auth/patient.dart' as _i2;
 import '../auth/dentist.dart' as _i3;
 import '../auth/admin.dart' as _i4;
-import 'package:dental_server/src/generated/protocol.dart' as _i5;
+import '../hospital/receptionist.dart' as _i5;
+import 'package:dental_server/src/generated/protocol.dart' as _i6;
 
 abstract class AuthResponse
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
@@ -24,6 +25,7 @@ abstract class AuthResponse
     this.patient,
     this.dentist,
     this.admin,
+    this.receptionist,
   });
 
   factory AuthResponse({
@@ -32,6 +34,7 @@ abstract class AuthResponse
     _i2.Patient? patient,
     _i3.Dentist? dentist,
     _i4.Admin? admin,
+    _i5.Receptionist? receptionist,
   }) = _AuthResponseImpl;
 
   factory AuthResponse.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -40,17 +43,22 @@ abstract class AuthResponse
       refreshToken: jsonSerialization['refreshToken'] as String,
       patient: jsonSerialization['patient'] == null
           ? null
-          : _i5.Protocol().deserialize<_i2.Patient>(
+          : _i6.Protocol().deserialize<_i2.Patient>(
               jsonSerialization['patient'],
             ),
       dentist: jsonSerialization['dentist'] == null
           ? null
-          : _i5.Protocol().deserialize<_i3.Dentist>(
+          : _i6.Protocol().deserialize<_i3.Dentist>(
               jsonSerialization['dentist'],
             ),
       admin: jsonSerialization['admin'] == null
           ? null
-          : _i5.Protocol().deserialize<_i4.Admin>(jsonSerialization['admin']),
+          : _i6.Protocol().deserialize<_i4.Admin>(jsonSerialization['admin']),
+      receptionist: jsonSerialization['receptionist'] == null
+          ? null
+          : _i6.Protocol().deserialize<_i5.Receptionist>(
+              jsonSerialization['receptionist'],
+            ),
     );
   }
 
@@ -64,6 +72,8 @@ abstract class AuthResponse
 
   _i4.Admin? admin;
 
+  _i5.Receptionist? receptionist;
+
   /// Returns a shallow copy of this [AuthResponse]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -73,6 +83,7 @@ abstract class AuthResponse
     _i2.Patient? patient,
     _i3.Dentist? dentist,
     _i4.Admin? admin,
+    _i5.Receptionist? receptionist,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -83,6 +94,7 @@ abstract class AuthResponse
       if (patient != null) 'patient': patient?.toJson(),
       if (dentist != null) 'dentist': dentist?.toJson(),
       if (admin != null) 'admin': admin?.toJson(),
+      if (receptionist != null) 'receptionist': receptionist?.toJson(),
     };
   }
 
@@ -95,6 +107,8 @@ abstract class AuthResponse
       if (patient != null) 'patient': patient?.toJsonForProtocol(),
       if (dentist != null) 'dentist': dentist?.toJsonForProtocol(),
       if (admin != null) 'admin': admin?.toJsonForProtocol(),
+      if (receptionist != null)
+        'receptionist': receptionist?.toJsonForProtocol(),
     };
   }
 
@@ -113,12 +127,14 @@ class _AuthResponseImpl extends AuthResponse {
     _i2.Patient? patient,
     _i3.Dentist? dentist,
     _i4.Admin? admin,
+    _i5.Receptionist? receptionist,
   }) : super._(
          token: token,
          refreshToken: refreshToken,
          patient: patient,
          dentist: dentist,
          admin: admin,
+         receptionist: receptionist,
        );
 
   /// Returns a shallow copy of this [AuthResponse]
@@ -131,6 +147,7 @@ class _AuthResponseImpl extends AuthResponse {
     Object? patient = _Undefined,
     Object? dentist = _Undefined,
     Object? admin = _Undefined,
+    Object? receptionist = _Undefined,
   }) {
     return AuthResponse(
       token: token ?? this.token,
@@ -138,6 +155,9 @@ class _AuthResponseImpl extends AuthResponse {
       patient: patient is _i2.Patient? ? patient : this.patient?.copyWith(),
       dentist: dentist is _i3.Dentist? ? dentist : this.dentist?.copyWith(),
       admin: admin is _i4.Admin? ? admin : this.admin?.copyWith(),
+      receptionist: receptionist is _i5.Receptionist?
+          ? receptionist
+          : this.receptionist?.copyWith(),
     );
   }
 }

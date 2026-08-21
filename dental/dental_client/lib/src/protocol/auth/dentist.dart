@@ -12,6 +12,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod_client/serverpod_client.dart' as _i1;
 import '../auth/dentist_status.dart' as _i2;
+import '../hospital/hospital.dart' as _i3;
+import 'package:dental_client/src/protocol/protocol.dart' as _i4;
 
 abstract class Dentist implements _i1.SerializableModel {
   Dentist._({
@@ -41,6 +43,8 @@ abstract class Dentist implements _i1.SerializableModel {
     this.terminatedAt,
     this.terminationReason,
     this.terminatedBy,
+    this.hospitalId,
+    this.hospital,
   });
 
   factory Dentist({
@@ -70,6 +74,8 @@ abstract class Dentist implements _i1.SerializableModel {
     DateTime? terminatedAt,
     String? terminationReason,
     String? terminatedBy,
+    int? hospitalId,
+    _i3.Hospital? hospital,
   }) = _DentistImpl;
 
   factory Dentist.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -116,6 +122,12 @@ abstract class Dentist implements _i1.SerializableModel {
             ),
       terminationReason: jsonSerialization['terminationReason'] as String?,
       terminatedBy: jsonSerialization['terminatedBy'] as String?,
+      hospitalId: jsonSerialization['hospitalId'] as int?,
+      hospital: jsonSerialization['hospital'] == null
+          ? null
+          : _i4.Protocol().deserialize<_i3.Hospital>(
+              jsonSerialization['hospital'],
+            ),
     );
   }
 
@@ -174,6 +186,10 @@ abstract class Dentist implements _i1.SerializableModel {
 
   String? terminatedBy;
 
+  int? hospitalId;
+
+  _i3.Hospital? hospital;
+
   /// Returns a shallow copy of this [Dentist]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
@@ -204,6 +220,8 @@ abstract class Dentist implements _i1.SerializableModel {
     DateTime? terminatedAt,
     String? terminationReason,
     String? terminatedBy,
+    int? hospitalId,
+    _i3.Hospital? hospital,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -237,6 +255,8 @@ abstract class Dentist implements _i1.SerializableModel {
       if (terminatedAt != null) 'terminatedAt': terminatedAt?.toJson(),
       if (terminationReason != null) 'terminationReason': terminationReason,
       if (terminatedBy != null) 'terminatedBy': terminatedBy,
+      if (hospitalId != null) 'hospitalId': hospitalId,
+      if (hospital != null) 'hospital': hospital?.toJson(),
     };
   }
 
@@ -276,6 +296,8 @@ class _DentistImpl extends Dentist {
     DateTime? terminatedAt,
     String? terminationReason,
     String? terminatedBy,
+    int? hospitalId,
+    _i3.Hospital? hospital,
   }) : super._(
          id: id,
          dentistCode: dentistCode,
@@ -303,6 +325,8 @@ class _DentistImpl extends Dentist {
          terminatedAt: terminatedAt,
          terminationReason: terminationReason,
          terminatedBy: terminatedBy,
+         hospitalId: hospitalId,
+         hospital: hospital,
        );
 
   /// Returns a shallow copy of this [Dentist]
@@ -336,6 +360,8 @@ class _DentistImpl extends Dentist {
     Object? terminatedAt = _Undefined,
     Object? terminationReason = _Undefined,
     Object? terminatedBy = _Undefined,
+    Object? hospitalId = _Undefined,
+    Object? hospital = _Undefined,
   }) {
     return Dentist(
       id: id is int? ? id : this.id,
@@ -380,6 +406,10 @@ class _DentistImpl extends Dentist {
           ? terminationReason
           : this.terminationReason,
       terminatedBy: terminatedBy is String? ? terminatedBy : this.terminatedBy,
+      hospitalId: hospitalId is int? ? hospitalId : this.hospitalId,
+      hospital: hospital is _i3.Hospital?
+          ? hospital
+          : this.hospital?.copyWith(),
     );
   }
 }

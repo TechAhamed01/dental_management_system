@@ -2,7 +2,10 @@ import 'package:serverpod/serverpod.dart';
 import '../generated/protocol.dart';
 import '../utils/password_utils.dart';
 import '../utils/jwt_utils.dart';
-
+import '../utils/auth_utils.dart';
+import 'dart:convert';
+import 'dart:typed_data';
+import '../services/document_storage_service.dart';
 class AuthEndpoint extends Endpoint {
 
   // PATIENT AUTHENTICATION
@@ -177,31 +180,127 @@ class AuthEndpoint extends Endpoint {
     final dentistCode = 'D${nextCodeNum.toString().padLeft(4, '0')}';
 
     final passwordHash = PasswordUtils.hashPassword(password);
-    final dentist = Dentist(
-      dentistCode: dentistCode,
-      fullName: fullName,
-      email: email,
-      phone: phone,
-      passwordHash: passwordHash,
-      dateOfBirth: dateOfBirth,
-      licenseNumber: licenseNumber,
-      specialization: specialization,
-      qualification: qualification,
-      experience: experience,
-      clinicName: clinicName,
-      clinicAddress: clinicAddress,
-      profilePhotoUrl: profilePhotoUrl,
-      registrationFileUrl: registrationFileUrl,
-      degreeFileUrl: degreeFileUrl,
-      idFileUrl: idFileUrl,
-      isTermsAccepted: isTermsAccepted,
-      status: DentistStatus.pending,
-    );
+    
+    // We will extract base64 data and replace with a marker
+    Future<Map<String, dynamic>?> processDoc(String? url, String docType) async {
+      if (url != null && url.startsWith('data:')) {
+        // e.g. data:image/png;base64,iVBORw0KGgo...
+        final commaIdx = url.indexOf(',');
+        if (commaIdx != -1) {
+          final metaStr = url.substring(5, commaIdx); // e.g. image/png;base64
+          final base64Str = url.substring(commaIdx + 1);
+          
+          final isBase64 = metaStr.contains('base64');
+          final mimeType = metaStr.split(';').first;
+          
+          if (isBase64) {
+            final bytes = base64Decode(base64Str);
+            final ext = mimeType.split('/').last;
+            final fileName = '$docType.$ext';
+            
+            return {
+              'mimeType': mimeType,
+              'fileName': fileName,
+              'bytes': bytes.buffer.asByteData(),
+              'size': bytes.length,
+            };
+          }
+        }
+      }
+      return null;
+    }
 
-    return await Dentist.db.insertRow(session, dentist);
+    return await session.db.transaction((transaction) async {
+      final docsToUpload = <String, Map<String, dynamic>>{};
+      
+      final profileMap = await processDoc(profilePhotoUrl, 'profile_photo');
+      if (profileMap != null) docsToUpload['profile_photo'] = profileMap;
+      
+      final regMap = await processDoc(registrationFileUrl, 'registration');
+      if (regMap != null) docsToUpload['registration'] = regMap;
+      
+      final degreeMap = await processDoc(degreeFileUrl, 'degree');
+      if (degreeMap != null) docsToUpload['degree'] = degreeMap;
+      
+      final idMap = await processDoc(idFileUrl, 'identification');
+      if (idMap != null) docsToUpload['identification'] = idMap;
+      
+      var dentist = Dentist(
+        dentistCode: dentistCode,
+        fullName: fullName,
+        email: email,
+        phone: phone,
+        passwordHash: passwordHash,
+        dateOfBirth: dateOfBirth,
+        licenseNumber: licenseNumber,
+        specialization: specialization,
+        qualification: qualification,
+        experience: experience,
+        clinicName: clinicName,
+        clinicAddress: clinicAddress,
+        profilePhotoUrl: profilePhotoUrl, // We will overwrite below if uploaded
+        registrationFileUrl: registrationFileUrl,
+        degreeFileUrl: degreeFileUrl,
+        idFileUrl: idFileUrl,
+        isTermsAccepted: isTermsAccepted,
+        status: DentistStatus.pending,
+      );
+
+      dentist = await Dentist.db.insertRow(session, dentist, transaction: transaction);
+      
+      // Now upload documents and create DentistDocument rows
+      final List<String> uploadedKeys = [];
+      bool needsUpdate = false;
+      
+      try {
+        for (final entry in docsToUpload.entries) {
+          final docType = entry.key;
+          final map = entry.value;
+          
+          final storageKey = await DocumentStorageService.uploadDocument(
+            dentistId: dentist.id!,
+            documentType: docType,
+            bytes: map['bytes'],
+          );
+          uploadedKeys.add(storageKey);
+          
+          var doc = DentistDocument(
+            dentistId: dentist.id!,
+            documentType: docType,
+            fileName: map['fileName'],
+            mimeType: map['mimeType'],
+            storageKey: storageKey,
+            fileSize: map['size'],
+            uploadedAt: DateTime.now(),
+          );
+          
+          doc = await DentistDocument.db.insertRow(session, doc, transaction: transaction);
+          
+          // Update the dentist record with the marker
+          if (docType == 'profile_photo') dentist.profilePhotoUrl = '[SECURE_DOCUMENT:${doc.id}]';
+          if (docType == 'registration') dentist.registrationFileUrl = '[SECURE_DOCUMENT:${doc.id}]';
+          if (docType == 'degree') dentist.degreeFileUrl = '[SECURE_DOCUMENT:${doc.id}]';
+          if (docType == 'identification') dentist.idFileUrl = '[SECURE_DOCUMENT:${doc.id}]';
+          needsUpdate = true;
+        }
+        
+        if (needsUpdate) {
+          await Dentist.db.updateRow(session, dentist, transaction: transaction);
+        }
+      } catch (e) {
+        // If anything fails during upload/DB insertion, clean up files manually 
+        // since the DB transaction will rollback, but files won't.
+        for (final key in uploadedKeys) {
+          await DocumentStorageService.deleteDocument(key);
+        }
+        throw Exception('Failed to upload registration documents: $e');
+      }
+
+      return dentist;
+    });
   }
 
-  Future<Dentist?> dentistLogin(
+  Future<AuthResponse> dentistLogin(
     Session session,
     String email,
     String password,
@@ -249,11 +348,35 @@ class AuthEndpoint extends Endpoint {
       }
     }
 
-    return dentist;
+    if (dentist.status == DentistStatus.pending || dentist.status == DentistStatus.rejected) {
+      throw Exception('Your account is not approved yet.');
+    }
+
+    final token = JwtUtils.generateAccessToken(dentist.id!, 'dentist');
+    final refreshToken = JwtUtils.generateRefreshToken(dentist.id!, 'dentist');
+
+    await session.caches.global.put(
+      'refresh_dentist_${dentist.id}',
+      refreshToken,
+      lifetime: const Duration(days: 7),
+    );
+
+    return AuthResponse(
+      token: token,
+      refreshToken: refreshToken,
+      dentist: dentist,
+    );
   }
 
-  // ADMIN AUTHENTICATION
-  Future<Admin?> adminLogin(
+  Future<void> dentistLogout(Session session, int dentistId) async {
+    final authUser = AuthUtils.requireRole(session, ['dentist']);
+    if (authUser.userId != dentistId) {
+      throw Exception('Forbidden. Cannot logout another user.');
+    }
+    await session.caches.global.invalidateKey('refresh_dentist_$dentistId');
+  }
+
+  Future<AuthResponse> adminLogin(
     Session session,
     String email,
     String password,
@@ -263,21 +386,92 @@ class AuthEndpoint extends Endpoint {
       where: (t) => t.email.equals(email),
     );
 
+    print('ADMIN LOGIN ATTEMPT: email=$email, admin_found=${admin != null}');
+    if (admin != null) {
+      print('ADMIN HASH: ${admin.passwordHash}, MATCH: ${PasswordUtils.verifyPassword(password, admin.passwordHash)}');
+    }
+
     if (admin == null || !PasswordUtils.verifyPassword(password, admin.passwordHash)) {
       throw Exception('Invalid admin email or password.');
     }
 
-    return admin;
+    final token = JwtUtils.generateAccessToken(admin.id!, 'admin');
+    final refreshToken = JwtUtils.generateRefreshToken(admin.id!, 'admin');
+
+    await session.caches.global.put(
+      'refresh_admin_${admin.id}',
+      refreshToken,
+      lifetime: const Duration(days: 7),
+    );
+
+    return AuthResponse(
+      token: token,
+      refreshToken: refreshToken,
+      admin: admin,
+    );
+  }
+
+  Future<void> adminLogout(Session session, int adminId) async {
+    final authUser = AuthUtils.requireRole(session, ['admin']);
+    if (authUser.userId != adminId) {
+      throw Exception('Forbidden.');
+    }
+    await session.caches.global.invalidateKey('refresh_admin_$adminId');
+  }
+
+  Future<AuthResponse> refreshAuthToken(Session session, String refreshToken) async {
+    final jwt = JwtUtils.verifyRefreshToken(refreshToken);
+    if (jwt == null) {
+      throw Exception('Invalid or expired refresh token.');
+    }
+
+    final userId = jwt.payload['userId'] as int;
+    final role = jwt.payload['role'] as String;
+    final hospitalId = jwt.payload['hospitalId'] as int?;
+
+    final storedToken = await session.caches.global.get<String>('refresh_${role}_$userId');
+    if (storedToken == null || storedToken != refreshToken) {
+      throw Exception('Refresh token revoked or not found.');
+    }
+
+    if (role == 'admin') {
+      final admin = await Admin.db.findById(session, userId);
+      if (admin == null) throw Exception('Admin not found.');
+      final newToken = JwtUtils.generateAccessToken(userId, role);
+      final newRefreshToken = JwtUtils.generateRefreshToken(userId, role);
+      await session.caches.global.put('refresh_${role}_$userId', newRefreshToken, lifetime: const Duration(days: 7));
+      return AuthResponse(token: newToken, refreshToken: newRefreshToken, admin: admin);
+    } else if (role == 'dentist') {
+      final dentist = await Dentist.db.findById(session, userId);
+      if (dentist == null) throw Exception('Dentist not found.');
+      if (dentist.status != DentistStatus.approved) throw Exception('Dentist account is not approved.');
+      final newToken = JwtUtils.generateAccessToken(userId, role);
+      final newRefreshToken = JwtUtils.generateRefreshToken(userId, role);
+      await session.caches.global.put('refresh_${role}_$userId', newRefreshToken, lifetime: const Duration(days: 7));
+      return AuthResponse(token: newToken, refreshToken: newRefreshToken, dentist: dentist);
+    } else if (role == 'receptionist') {
+      final receptionist = await Receptionist.db.findById(session, userId);
+      if (receptionist == null || !receptionist.isActive) throw Exception('Receptionist not found or inactive.');
+      final newToken = JwtUtils.generateAccessToken(userId, role, hospitalId: hospitalId);
+      final newRefreshToken = JwtUtils.generateRefreshToken(userId, role, hospitalId: hospitalId);
+      await session.caches.global.put('refresh_${role}_$userId', newRefreshToken, lifetime: const Duration(days: 7));
+      return AuthResponse(token: newToken, refreshToken: newRefreshToken, receptionist: receptionist);
+    } else {
+      throw Exception('Role $role cannot use this generic refresh endpoint. Use patientRefreshToken.');
+    }
   }
 
   Future<List<Dentist>> getPendingDentists(Session session) async {
+    AuthUtils.requireRole(session, ['admin']);
     return await Dentist.db.find(
       session,
       where: (t) => t.status.equals(DentistStatus.pending),
+      include: Dentist.include(hospital: Hospital.include()),
     );
   }
 
   Future<Dentist> approveDentist(Session session, int dentistId, {String adminEmail = 'Admin'}) async {
+    AuthUtils.requireRole(session, ['admin']);
     final dentist = await Dentist.db.findById(session, dentistId);
     if (dentist == null) {
       throw Exception('Dentist not found.');
@@ -298,6 +492,7 @@ class AuthEndpoint extends Endpoint {
   }
 
   Future<Dentist> rejectDentist(Session session, int dentistId, {String adminEmail = 'Admin', String? reason}) async {
+    AuthUtils.requireRole(session, ['admin']);
     final dentist = await Dentist.db.findById(session, dentistId);
     if (dentist == null) {
       throw Exception('Dentist not found.');
@@ -324,6 +519,7 @@ class AuthEndpoint extends Endpoint {
     String reason, {
     String adminEmail = 'Admin',
   }) async {
+    AuthUtils.requireRole(session, ['admin']);
     final dentist = await Dentist.db.findById(session, dentistId);
     if (dentist == null) {
       throw Exception('Dentist not found.');
@@ -360,6 +556,7 @@ class AuthEndpoint extends Endpoint {
     String reason, {
     String adminEmail = 'Admin',
   }) async {
+    AuthUtils.requireRole(session, ['admin']);
     final dentist = await Dentist.db.findById(session, dentistId);
     if (dentist == null) {
       throw Exception('Dentist not found.');
@@ -388,6 +585,7 @@ class AuthEndpoint extends Endpoint {
   }
 
   Future<List<AuditLog>> getDentistAuditLogs(Session session, int dentistId) async {
+    AuthUtils.requireRole(session, ['admin']);
     final logs = await AuditLog.db.find(
       session,
       where: (t) => t.dentistId.equals(dentistId),
@@ -397,6 +595,7 @@ class AuthEndpoint extends Endpoint {
   }
 
   Future<void> logPdfDownload(Session session, int dentistId, {String adminEmail = 'Admin'}) async {
+    AuthUtils.requireRole(session, ['admin']);
     try {
       await _recordAuditLog(session, dentistId, adminEmail, 'Downloaded PDF', 'Admin downloaded dentist profile & application report');
     } catch (e) {
@@ -412,6 +611,7 @@ class AuthEndpoint extends Endpoint {
   }
 
   Future<DashboardStats> getDashboardStats(Session session) async {
+    AuthUtils.requireRole(session, ['admin']);
     final totalPatients = await Patient.db.count(session);
     final totalDoctors = await Dentist.db.count(session);
     final pendingDoctors = await Dentist.db.count(session, where: (t) => t.status.equals(DentistStatus.pending));
@@ -436,23 +636,42 @@ class AuthEndpoint extends Endpoint {
   }
 
   Future<List<Dentist>> getAllDentists(Session session) async {
-    return await Dentist.db.find(session);
+    return await Dentist.db.find(
+      session,
+      include: Dentist.include(hospital: Hospital.include()),
+    );
   }
 
   Future<List<Dentist>> getApprovedDentists(Session session) async {
-    return await Dentist.db.find(session, where: (t) => t.status.equals(DentistStatus.approved));
+    return await Dentist.db.find(
+      session, 
+      where: (t) => t.status.equals(DentistStatus.approved),
+      include: Dentist.include(hospital: Hospital.include()),
+    );
   }
 
   Future<List<Dentist>> getRejectedDentists(Session session) async {
-    return await Dentist.db.find(session, where: (t) => t.status.equals(DentistStatus.rejected));
+    return await Dentist.db.find(
+      session, 
+      where: (t) => t.status.equals(DentistStatus.rejected),
+      include: Dentist.include(hospital: Hospital.include()),
+    );
   }
 
   Future<List<Dentist>> getSuspendedDentists(Session session) async {
-    return await Dentist.db.find(session, where: (t) => t.status.equals(DentistStatus.suspended));
+    return await Dentist.db.find(
+      session, 
+      where: (t) => t.status.equals(DentistStatus.suspended),
+      include: Dentist.include(hospital: Hospital.include()),
+    );
   }
 
   Future<List<Dentist>> getTerminatedDentists(Session session) async {
-    return await Dentist.db.find(session, where: (t) => t.status.equals(DentistStatus.terminated));
+    return await Dentist.db.find(
+      session, 
+      where: (t) => t.status.equals(DentistStatus.terminated),
+      include: Dentist.include(hospital: Hospital.include()),
+    );
   }
 
   Future<void> _recordAuditLog(
