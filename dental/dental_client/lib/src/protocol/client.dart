@@ -22,13 +22,15 @@ import 'package:dental_client/src/protocol/auth/auth_response.dart' as _i7;
 import 'package:dental_client/src/protocol/auth/audit_log.dart' as _i8;
 import 'package:dental_client/src/protocol/auth/dashboard_stats.dart' as _i9;
 import 'package:dental_client/src/protocol/auth/patient.dart' as _i10;
-import 'package:dental_client/src/protocol/dentist_document/dentist_document.dart'
+import 'package:dental_client/src/protocol/appointment/dental_image.dart'
     as _i11;
 import 'dart:typed_data' as _i12;
-import 'package:dental_client/src/protocol/hospital/hospital.dart' as _i13;
-import 'package:dental_client/src/protocol/hospital/receptionist.dart' as _i14;
-import 'package:dental_client/src/protocol/greetings/greeting.dart' as _i15;
-import 'protocol.dart' as _i16;
+import 'package:dental_client/src/protocol/dentist_document/dentist_document.dart'
+    as _i13;
+import 'package:dental_client/src/protocol/hospital/hospital.dart' as _i14;
+import 'package:dental_client/src/protocol/hospital/receptionist.dart' as _i15;
+import 'package:dental_client/src/protocol/greetings/greeting.dart' as _i16;
+import 'protocol.dart' as _i17;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -613,6 +615,48 @@ class EndpointAuth extends _i2.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointDentalImage extends _i2.EndpointRef {
+  EndpointDentalImage(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'dentalImage';
+
+  /// Uploads a dental image for an appointment
+  _i3.Future<_i11.DentalImage> uploadDentalImage(
+    int appointmentId,
+    String fileName,
+    String mimeType,
+    _i12.ByteData imageData,
+  ) => caller.callServerEndpoint<_i11.DentalImage>(
+    'dentalImage',
+    'uploadDentalImage',
+    {
+      'appointmentId': appointmentId,
+      'fileName': fileName,
+      'mimeType': mimeType,
+      'imageData': imageData,
+    },
+  );
+
+  /// Gets all dental images for a specific appointment
+  _i3.Future<List<_i11.DentalImage>> getDentalImagesForAppointment(
+    int appointmentId,
+  ) => caller.callServerEndpoint<List<_i11.DentalImage>>(
+    'dentalImage',
+    'getDentalImagesForAppointment',
+    {'appointmentId': appointmentId},
+  );
+
+  /// Downloads a dental image securely
+  _i3.Future<_i12.ByteData> downloadDentalImage(int dentalImageId) =>
+      caller.callServerEndpoint<_i12.ByteData>(
+        'dentalImage',
+        'downloadDentalImage',
+        {'dentalImageId': dentalImageId},
+      );
+}
+
+/// {@category Endpoint}
 class EndpointDocument extends _i2.EndpointRef {
   EndpointDocument(_i2.EndpointCaller caller) : super(caller);
 
@@ -624,8 +668,8 @@ class EndpointDocument extends _i2.EndpointRef {
   /// - Admin: All access
   /// - Dentist: Only their own
   /// - Receptionist: Only dentists in their hospital
-  _i3.Future<List<_i11.DentistDocument>> getDentistDocuments(int dentistId) =>
-      caller.callServerEndpoint<List<_i11.DentistDocument>>(
+  _i3.Future<List<_i13.DentistDocument>> getDentistDocuments(int dentistId) =>
+      caller.callServerEndpoint<List<_i13.DentistDocument>>(
         'document',
         'getDentistDocuments',
         {'dentistId': dentistId},
@@ -647,12 +691,12 @@ class EndpointHospital extends _i2.EndpointRef {
   @override
   String get name => 'hospital';
 
-  _i3.Future<_i13.Hospital> createHospital(
+  _i3.Future<_i14.Hospital> createHospital(
     String name,
     String address,
     String phone,
     String email,
-  ) => caller.callServerEndpoint<_i13.Hospital>(
+  ) => caller.callServerEndpoint<_i14.Hospital>(
     'hospital',
     'createHospital',
     {
@@ -663,22 +707,22 @@ class EndpointHospital extends _i2.EndpointRef {
     },
   );
 
-  _i3.Future<_i13.Hospital?> getHospital(int id) =>
-      caller.callServerEndpoint<_i13.Hospital?>(
+  _i3.Future<_i14.Hospital?> getHospital(int id) =>
+      caller.callServerEndpoint<_i14.Hospital?>(
         'hospital',
         'getHospital',
         {'id': id},
       );
 
-  _i3.Future<List<_i13.Hospital>> listActiveHospitals() =>
-      caller.callServerEndpoint<List<_i13.Hospital>>(
+  _i3.Future<List<_i14.Hospital>> listActiveHospitals() =>
+      caller.callServerEndpoint<List<_i14.Hospital>>(
         'hospital',
         'listActiveHospitals',
         {},
       );
 
-  _i3.Future<_i13.Hospital> updateHospital(_i13.Hospital hospital) =>
-      caller.callServerEndpoint<_i13.Hospital>(
+  _i3.Future<_i14.Hospital> updateHospital(_i14.Hospital hospital) =>
+      caller.callServerEndpoint<_i14.Hospital>(
         'hospital',
         'updateHospital',
         {'hospital': hospital},
@@ -711,13 +755,13 @@ class EndpointReceptionist extends _i2.EndpointRef {
         {'receptionistId': receptionistId},
       );
 
-  _i3.Future<_i14.Receptionist> createReceptionist(
+  _i3.Future<_i15.Receptionist> createReceptionist(
     int hospitalId,
     String fullName,
     String email,
     String phone,
     String password,
-  ) => caller.callServerEndpoint<_i14.Receptionist>(
+  ) => caller.callServerEndpoint<_i15.Receptionist>(
     'receptionist',
     'createReceptionist',
     {
@@ -787,8 +831,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i15.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i15.Greeting>(
+  _i3.Future<_i16.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i16.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -826,7 +870,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i16.Protocol(),
+         _i17.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -839,6 +883,7 @@ class Client extends _i2.ServerpodClientShared {
     jwtRefresh = EndpointJwtRefresh(this);
     appointment = EndpointAppointment(this);
     auth = EndpointAuth(this);
+    dentalImage = EndpointDentalImage(this);
     document = EndpointDocument(this);
     hospital = EndpointHospital(this);
     receptionist = EndpointReceptionist(this);
@@ -853,6 +898,8 @@ class Client extends _i2.ServerpodClientShared {
   late final EndpointAppointment appointment;
 
   late final EndpointAuth auth;
+
+  late final EndpointDentalImage dentalImage;
 
   late final EndpointDocument document;
 
@@ -870,6 +917,7 @@ class Client extends _i2.ServerpodClientShared {
     'jwtRefresh': jwtRefresh,
     'appointment': appointment,
     'auth': auth,
+    'dentalImage': dentalImage,
     'document': document,
     'hospital': hospital,
     'receptionist': receptionist,

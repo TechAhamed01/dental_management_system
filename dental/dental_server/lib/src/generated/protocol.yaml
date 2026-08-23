@@ -44,6 +44,10 @@ auth:
   - getRejectedDentists:
   - getSuspendedDentists:
   - getTerminatedDentists:
+dentalImage:
+  - uploadDentalImage:
+  - getDentalImagesForAppointment:
+  - downloadDentalImage:
 document:
   - getDentistDocuments:
   - downloadDocument:

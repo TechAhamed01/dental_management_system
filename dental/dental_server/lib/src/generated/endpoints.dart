@@ -15,15 +15,17 @@ import '../auth/email_idp_endpoint.dart' as _i2;
 import '../auth/jwt_refresh_endpoint.dart' as _i3;
 import '../endpoints/appointment_endpoint.dart' as _i4;
 import '../endpoints/auth_endpoint.dart' as _i5;
-import '../endpoints/document_endpoint.dart' as _i6;
-import '../endpoints/hospital_endpoint.dart' as _i7;
-import '../endpoints/receptionist_endpoint.dart' as _i8;
-import '../greetings/greeting_endpoint.dart' as _i9;
-import 'package:dental_server/src/generated/hospital/hospital.dart' as _i10;
+import '../endpoints/dental_image_endpoint.dart' as _i6;
+import '../endpoints/document_endpoint.dart' as _i7;
+import '../endpoints/hospital_endpoint.dart' as _i8;
+import '../endpoints/receptionist_endpoint.dart' as _i9;
+import '../greetings/greeting_endpoint.dart' as _i10;
+import 'dart:typed_data' as _i11;
+import 'package:dental_server/src/generated/hospital/hospital.dart' as _i12;
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart'
-    as _i11;
+    as _i13;
 import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
-    as _i12;
+    as _i14;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -53,25 +55,31 @@ class Endpoints extends _i1.EndpointDispatch {
           'auth',
           null,
         ),
-      'document': _i6.DocumentEndpoint()
+      'dentalImage': _i6.DentalImageEndpoint()
+        ..initialize(
+          server,
+          'dentalImage',
+          null,
+        ),
+      'document': _i7.DocumentEndpoint()
         ..initialize(
           server,
           'document',
           null,
         ),
-      'hospital': _i7.HospitalEndpoint()
+      'hospital': _i8.HospitalEndpoint()
         ..initialize(
           server,
           'hospital',
           null,
         ),
-      'receptionist': _i8.ReceptionistEndpoint()
+      'receptionist': _i9.ReceptionistEndpoint()
         ..initialize(
           server,
           'receptionist',
           null,
         ),
-      'greeting': _i9.GreetingEndpoint()
+      'greeting': _i10.GreetingEndpoint()
         ..initialize(
           server,
           'greeting',
@@ -1015,6 +1023,87 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
+    connectors['dentalImage'] = _i1.EndpointConnector(
+      name: 'dentalImage',
+      endpoint: endpoints['dentalImage']!,
+      methodConnectors: {
+        'uploadDentalImage': _i1.MethodConnector(
+          name: 'uploadDentalImage',
+          params: {
+            'appointmentId': _i1.ParameterDescription(
+              name: 'appointmentId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+            'fileName': _i1.ParameterDescription(
+              name: 'fileName',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'mimeType': _i1.ParameterDescription(
+              name: 'mimeType',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'imageData': _i1.ParameterDescription(
+              name: 'imageData',
+              type: _i1.getType<_i11.ByteData>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['dentalImage'] as _i6.DentalImageEndpoint)
+                  .uploadDentalImage(
+                    session,
+                    params['appointmentId'],
+                    params['fileName'],
+                    params['mimeType'],
+                    params['imageData'],
+                  ),
+        ),
+        'getDentalImagesForAppointment': _i1.MethodConnector(
+          name: 'getDentalImagesForAppointment',
+          params: {
+            'appointmentId': _i1.ParameterDescription(
+              name: 'appointmentId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['dentalImage'] as _i6.DentalImageEndpoint)
+                  .getDentalImagesForAppointment(
+                    session,
+                    params['appointmentId'],
+                  ),
+        ),
+        'downloadDentalImage': _i1.MethodConnector(
+          name: 'downloadDentalImage',
+          params: {
+            'dentalImageId': _i1.ParameterDescription(
+              name: 'dentalImageId',
+              type: _i1.getType<int>(),
+              nullable: false,
+            ),
+          },
+          call:
+              (
+                _i1.Session session,
+                Map<String, dynamic> params,
+              ) async => (endpoints['dentalImage'] as _i6.DentalImageEndpoint)
+                  .downloadDentalImage(
+                    session,
+                    params['dentalImageId'],
+                  ),
+        ),
+      },
+    );
     connectors['document'] = _i1.EndpointConnector(
       name: 'document',
       endpoint: endpoints['document']!,
@@ -1032,7 +1121,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['document'] as _i6.DocumentEndpoint)
+              ) async => (endpoints['document'] as _i7.DocumentEndpoint)
                   .getDentistDocuments(
                     session,
                     params['dentistId'],
@@ -1051,7 +1140,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['document'] as _i6.DocumentEndpoint)
+              ) async => (endpoints['document'] as _i7.DocumentEndpoint)
                   .downloadDocument(
                     session,
                     params['documentId'],
@@ -1091,7 +1180,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['hospital'] as _i7.HospitalEndpoint)
+              ) async => (endpoints['hospital'] as _i8.HospitalEndpoint)
                   .createHospital(
                     session,
                     params['name'],
@@ -1114,7 +1203,7 @@ class Endpoints extends _i1.EndpointDispatch {
                 _i1.Session session,
                 Map<String, dynamic> params,
               ) async =>
-                  (endpoints['hospital'] as _i7.HospitalEndpoint).getHospital(
+                  (endpoints['hospital'] as _i8.HospitalEndpoint).getHospital(
                     session,
                     params['id'],
                   ),
@@ -1126,7 +1215,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['hospital'] as _i7.HospitalEndpoint)
+              ) async => (endpoints['hospital'] as _i8.HospitalEndpoint)
                   .listActiveHospitals(session),
         ),
         'updateHospital': _i1.MethodConnector(
@@ -1134,7 +1223,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'hospital': _i1.ParameterDescription(
               name: 'hospital',
-              type: _i1.getType<_i10.Hospital>(),
+              type: _i1.getType<_i12.Hospital>(),
               nullable: false,
             ),
           },
@@ -1142,7 +1231,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['hospital'] as _i7.HospitalEndpoint)
+              ) async => (endpoints['hospital'] as _i8.HospitalEndpoint)
                   .updateHospital(
                     session,
                     params['hospital'],
@@ -1172,7 +1261,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['receptionist'] as _i8.ReceptionistEndpoint)
+              ) async => (endpoints['receptionist'] as _i9.ReceptionistEndpoint)
                   .receptionistLogin(
                     session,
                     params['email'],
@@ -1192,7 +1281,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['receptionist'] as _i8.ReceptionistEndpoint)
+              ) async => (endpoints['receptionist'] as _i9.ReceptionistEndpoint)
                   .receptionistLogout(
                     session,
                     params['receptionistId'],
@@ -1231,7 +1320,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['receptionist'] as _i8.ReceptionistEndpoint)
+              ) async => (endpoints['receptionist'] as _i9.ReceptionistEndpoint)
                   .createReceptionist(
                     session,
                     params['hospitalId'],
@@ -1329,7 +1418,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['receptionist'] as _i8.ReceptionistEndpoint)
+              ) async => (endpoints['receptionist'] as _i9.ReceptionistEndpoint)
                   .receptionistRegisterDentist(
                     session,
                     params['fullName'],
@@ -1357,7 +1446,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['receptionist'] as _i8.ReceptionistEndpoint)
+              ) async => (endpoints['receptionist'] as _i9.ReceptionistEndpoint)
                   .getDentistsForHospital(session),
         ),
       },
@@ -1379,16 +1468,16 @@ class Endpoints extends _i1.EndpointDispatch {
               (
                 _i1.Session session,
                 Map<String, dynamic> params,
-              ) async => (endpoints['greeting'] as _i9.GreetingEndpoint).hello(
+              ) async => (endpoints['greeting'] as _i10.GreetingEndpoint).hello(
                 session,
                 params['name'],
               ),
         ),
       },
     );
-    modules['serverpod_auth_idp'] = _i11.Endpoints()
+    modules['serverpod_auth_idp'] = _i13.Endpoints()
       ..initializeEndpoints(server);
-    modules['serverpod_auth_core'] = _i12.Endpoints()
+    modules['serverpod_auth_core'] = _i14.Endpoints()
       ..initializeEndpoints(server);
   }
 }

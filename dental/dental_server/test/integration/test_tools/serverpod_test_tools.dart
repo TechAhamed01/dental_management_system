@@ -23,12 +23,14 @@ import 'package:dental_server/src/generated/auth/auth_response.dart' as _i7;
 import 'package:dental_server/src/generated/auth/audit_log.dart' as _i8;
 import 'package:dental_server/src/generated/auth/dashboard_stats.dart' as _i9;
 import 'package:dental_server/src/generated/auth/patient.dart' as _i10;
-import 'package:dental_server/src/generated/dentist_document/dentist_document.dart'
+import 'package:dental_server/src/generated/appointment/dental_image.dart'
     as _i11;
 import 'dart:typed_data' as _i12;
-import 'package:dental_server/src/generated/hospital/hospital.dart' as _i13;
-import 'package:dental_server/src/generated/hospital/receptionist.dart' as _i14;
-import 'package:dental_server/src/generated/greetings/greeting.dart' as _i15;
+import 'package:dental_server/src/generated/dentist_document/dentist_document.dart'
+    as _i13;
+import 'package:dental_server/src/generated/hospital/hospital.dart' as _i14;
+import 'package:dental_server/src/generated/hospital/receptionist.dart' as _i15;
+import 'package:dental_server/src/generated/greetings/greeting.dart' as _i16;
 import 'package:dental_server/src/generated/protocol.dart';
 import 'package:dental_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -151,6 +153,8 @@ class TestEndpoints {
 
   late final _AuthEndpoint auth;
 
+  late final _DentalImageEndpoint dentalImage;
+
   late final _DocumentEndpoint document;
 
   late final _HospitalEndpoint hospital;
@@ -180,6 +184,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     auth = _AuthEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    dentalImage = _DentalImageEndpoint(
       endpoints,
       serializationManager,
     );
@@ -1647,6 +1655,118 @@ class _AuthEndpoint {
   }
 }
 
+class _DentalImageEndpoint {
+  _DentalImageEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<_i11.DentalImage> uploadDentalImage(
+    _i1.TestSessionBuilder sessionBuilder,
+    int appointmentId,
+    String fileName,
+    String mimeType,
+    _i12.ByteData imageData,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'dentalImage',
+            method: 'uploadDentalImage',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'dentalImage',
+          methodName: 'uploadDentalImage',
+          parameters: _i1.testObjectToJson({
+            'appointmentId': appointmentId,
+            'fileName': fileName,
+            'mimeType': mimeType,
+            'imageData': imageData,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i11.DentalImage>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i11.DentalImage>> getDentalImagesForAppointment(
+    _i1.TestSessionBuilder sessionBuilder,
+    int appointmentId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'dentalImage',
+            method: 'getDentalImagesForAppointment',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'dentalImage',
+          methodName: 'getDentalImagesForAppointment',
+          parameters: _i1.testObjectToJson({'appointmentId': appointmentId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i11.DentalImage>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i12.ByteData> downloadDentalImage(
+    _i1.TestSessionBuilder sessionBuilder,
+    int dentalImageId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'dentalImage',
+            method: 'downloadDentalImage',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'dentalImage',
+          methodName: 'downloadDentalImage',
+          parameters: _i1.testObjectToJson({'dentalImageId': dentalImageId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i12.ByteData>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
 class _DocumentEndpoint {
   _DocumentEndpoint(
     this._endpointDispatch,
@@ -1657,7 +1777,7 @@ class _DocumentEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<List<_i11.DentistDocument>> getDentistDocuments(
+  _i3.Future<List<_i13.DentistDocument>> getDentistDocuments(
     _i1.TestSessionBuilder sessionBuilder,
     int dentistId,
   ) async {
@@ -1680,7 +1800,7 @@ class _DocumentEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i11.DentistDocument>>);
+                as _i3.Future<List<_i13.DentistDocument>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1730,7 +1850,7 @@ class _HospitalEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i13.Hospital> createHospital(
+  _i3.Future<_i14.Hospital> createHospital(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
     String address,
@@ -1761,7 +1881,7 @@ class _HospitalEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i13.Hospital>);
+                as _i3.Future<_i14.Hospital>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1769,7 +1889,7 @@ class _HospitalEndpoint {
     });
   }
 
-  _i3.Future<_i13.Hospital?> getHospital(
+  _i3.Future<_i14.Hospital?> getHospital(
     _i1.TestSessionBuilder sessionBuilder,
     int id,
   ) async {
@@ -1792,7 +1912,7 @@ class _HospitalEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i13.Hospital?>);
+                as _i3.Future<_i14.Hospital?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1800,7 +1920,7 @@ class _HospitalEndpoint {
     });
   }
 
-  _i3.Future<List<_i13.Hospital>> listActiveHospitals(
+  _i3.Future<List<_i14.Hospital>> listActiveHospitals(
     _i1.TestSessionBuilder sessionBuilder,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
@@ -1822,7 +1942,7 @@ class _HospitalEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i13.Hospital>>);
+                as _i3.Future<List<_i14.Hospital>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1830,9 +1950,9 @@ class _HospitalEndpoint {
     });
   }
 
-  _i3.Future<_i13.Hospital> updateHospital(
+  _i3.Future<_i14.Hospital> updateHospital(
     _i1.TestSessionBuilder sessionBuilder,
-    _i13.Hospital hospital,
+    _i14.Hospital hospital,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
@@ -1853,7 +1973,7 @@ class _HospitalEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i13.Hospital>);
+                as _i3.Future<_i14.Hospital>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -1938,7 +2058,7 @@ class _ReceptionistEndpoint {
     });
   }
 
-  _i3.Future<_i14.Receptionist> createReceptionist(
+  _i3.Future<_i15.Receptionist> createReceptionist(
     _i1.TestSessionBuilder sessionBuilder,
     int hospitalId,
     String fullName,
@@ -1971,7 +2091,7 @@ class _ReceptionistEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i14.Receptionist>);
+                as _i3.Future<_i15.Receptionist>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -2083,7 +2203,7 @@ class _GreetingEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i15.Greeting> hello(
+  _i3.Future<_i16.Greeting> hello(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
   ) async {
@@ -2106,7 +2226,7 @@ class _GreetingEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i15.Greeting>);
+                as _i3.Future<_i16.Greeting>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

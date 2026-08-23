@@ -1,0 +1,14 @@
+class: DentalImage
+table: dental_image
+fields:
+  patientId: int
+  patient: Patient?, relation(field=patientId)
+  appointmentId: int
+  appointment: Appointment?, relation(field=appointmentId)
+  dentistId: int
+  dentist: Dentist?, relation(field=dentistId)
+  fileName: String
+  mimeType: String
+  storageKey: String
+  fileSize: int
+  uploadedAt: DateTime

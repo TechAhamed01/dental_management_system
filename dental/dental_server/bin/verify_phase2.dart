@@ -53,7 +53,7 @@ void main() async {
     Receptionist? testReceptionist;
     try {
       final authRes = await client.receptionist.receptionistLogin(testReceptionistEmail, 'Test@12345');
-      testReceptionist = (authRes as AuthenticationResponse).receptionist;
+      testReceptionist = (authRes as AuthResponse).receptionist;
     } catch (e) {
       // Not found or login failed, create it
       testReceptionist = await client.receptionist.createReceptionist(
