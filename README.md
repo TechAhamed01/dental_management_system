@@ -41,19 +41,39 @@ docker compose logs -f backend
 ```
 *(The backend automatically boots, fetches dependencies, applies migrations, and runs Serverpod in `docker` mode).*
 
-**Run a Flutter Web App:**
-Open a new VS Code terminal and navigate to your desired app:
+**Seed Initial Data (Admin & Receptionist):**
+If you have just cloned the repo and want to initialize the database with test profiles, open a new terminal (on your local machine) and run:
 ```bash
-cd patient_app
-flutter run -d web-server --web-port=49594 --web-hostname=0.0.0.0
+# Creates the default admin
+docker compose exec backend bash -c "cd /app/dental/dental_server && dart bin/create_admin.dart"
+
+# Creates the default Test Hospital and Receptionist
+docker compose exec backend bash -c "cd /app/dental/dental_server && dart bin/seed_receptionist.dart"
+```
+
+**Run a Flutter Web App:**
+Open a new VS Code terminal (inside the `frontend` container) and navigate to your desired app:
+```bash
+cd receptionist_dashboard
+```
+
+**Important Note for Linux/Web Builds:** The `file_picker` package sometimes fails to compile on web due to missing Linux dependencies (`dbus`) in the pub cache. To fix this, always clean your project before running for the first time:
+```bash
+flutter clean
+flutter pub get
+```
+
+Then start the app:
+```bash
+flutter run -d web-server --web-hostname 0.0.0.0 --web-port 65157
 ```
 *(Use `--web-hostname=0.0.0.0` so it is accessible outside the container).*
 
 **Ports mapped for Flutter Apps:**
-- Doctor App: `50810`
+- Doctor App: `45010`
+- Admin Dashboard: `45011`
 - Patient App: `49594`
 - Receptionist Dashboard: `65157`
-- Admin Dashboard: `50811`
 
 ### Data Persistence
 - **PostgreSQL Database**, **Redis**, **Dentist Documents**, and **Dental Images** are securely stored in persistent Docker volumes.
