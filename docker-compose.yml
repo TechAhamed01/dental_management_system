@@ -1,0 +1,85 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    ports:
+      - "8090:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dental}
+      POSTGRES_DB: ${POSTGRES_DB:-dental}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-asdf@123}
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - dental_network
+
+  redis:
+    image: redis:6.2.6
+    ports:
+      - "8091:6379"
+    command: redis-server --requirepass "${REDIS_PASSWORD:-dummy-password}"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    networks:
+      - dental_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: .devcontainer/backend.Dockerfile
+    # The command keeps the container alive and runs Serverpod
+    # wait-for-it or just a simple sleep can be used to ensure DB is up, 
+    # but Serverpod has retry logic.
+    command: >
+      bash -c "cd /app/dental/dental_server && dart pub get && dart bin/main.dart --apply-migrations"
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+      - "8082:8082"
+    environment:
+      SERVERPOD_MODE: docker
+      SERVERPOD_DATABASE_HOST: postgres
+      SERVERPOD_DATABASE_PORT: 5432
+      SERVERPOD_DATABASE_NAME: dental
+      SERVERPOD_DATABASE_USER: dental
+      SERVERPOD_DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-asdf@123}
+      SERVERPOD_REDIS_HOST: redis
+      SERVERPOD_REDIS_PORT: 6379
+      SERVERPOD_REDIS_PASSWORD: ${REDIS_PASSWORD:-dummy-password}
+      SERVERPOD_PASSWORDS: '{"docker":{"database":"${POSTGRES_PASSWORD:-asdf@123}","redis":"${REDIS_PASSWORD:-dummy-password}","serviceSecret":"vvcoPaRHhXfAKeH3z1C1EiJXHOdGO5t2","emailSecretHashPepper":"mCGoS7L9_5_eu2v1AdecTSfrbNgU0A_z","jwtHmacSha512PrivateKey":"1VtkaqxN2rxQqy-3iAej6j6NIB7cELRy","jwtRefreshTokenHashPepper":"7HcvduSRiTAOy9V2u_5Yw2U41LhtbRs1"}}'
+    volumes:
+      - .:/app
+      - dentist_documents:/app/dental/dental_server/.storage/dentist_documents
+      - dental_images:/app/dental/dental_server/.storage/dental_images
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - dental_network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: .devcontainer/frontend.Dockerfile
+    # Keeps container alive so VS Code can attach
+    command: tail -f /dev/null
+    ports:
+      # Expose common Flutter Web ports
+      - "45010:45010" # Doctor App
+      - "49594:49594" # Patient App
+      - "65157:65157" # Receptionist App
+      - "45011:45011" # Admin App
+    volumes:
+      - .:/workspace
+      - flutter_sdk:/opt/flutter
+    networks:
+      - dental_network
+
+volumes:
+  pg_data:
+  dentist_documents:
+  dental_images:
+  flutter_sdk:
+
+networks:
+  dental_network:
+    driver: bridge
