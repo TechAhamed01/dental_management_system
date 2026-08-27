@@ -25,15 +25,27 @@ We use Docker and VS Code Dev Containers to ensure a consistent, zero-install de
    cp .env.example .env
    ```
 
-3. **Start the Environment:**
+3. **Start the Environment (Build Docker Containers):**
+   You can start the environment either using the terminal or VS Code Dev Containers.
+
+   **Option A: Using Terminal (Recommended)**
+   Run the following command to build and start all the containers in the background:
+   ```bash
+   docker-compose up --build -d
+   ```
+   *(This will build the frontend and backend images, and start postgres and redis. It may take a few minutes the first time.)*
+
+   **Option B: Using VS Code Dev Containers**
    Open the repository folder in VS Code. You should see a prompt: **"Folder contains a Dev Container configuration file. Reopen in Container"**. Click **Reopen in Container**.
    *(If you don't see the prompt, press `Ctrl+Shift+P` and type `Dev Containers: Reopen in Container`)*.
 
-   Docker will now build the `frontend` container (with Flutter) and start the `backend`, `postgres`, and `redis` services in the background.
-
 ### Running the Application
 
-Inside the VS Code integrated terminal (which is now securely inside the `frontend` container):
+Once the containers are built and running, you can access the frontend terminal to run the Flutter apps. To open the frontend terminal, run:
+```bash
+docker-compose exec frontend bash
+```
+*(All `flutter run` commands below should be executed inside this terminal).*
 
 **Start the Backend (if not already running automatically):**
 ```bash
