@@ -6,7 +6,7 @@ import '../utils/colors.dart';
 import '../utils/text_styles.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_textfield.dart';
-import 'basic_info.dart';
+
 import 'confirmation.dart';
 import 'home_screen.dart';
 import 'rejected_screen.dart';
@@ -243,34 +243,7 @@ class _DoctorLoginState extends State<DoctorLogin> {
 
                     const SizedBox(height: 30),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
 
-                        const Text("Don't have an account? "),
-
-                        GestureDetector(
-                          onTap: controller.isLoading
-                              ? null
-                              : () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const BasicInfo(),
-                                    ),
-                                  );
-                                },
-                          child: const Text(
-                            "Sign Up",
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-
-                      ],
-                    ),
                   ],
                 ),
               ),
