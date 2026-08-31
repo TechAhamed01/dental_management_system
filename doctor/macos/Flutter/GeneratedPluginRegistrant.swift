@@ -7,10 +7,12 @@ import Foundation
 
 import connectivity_plus
 import file_picker
+import file_saver
 import flutter_secure_storage_darwin
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   ConnectivityPlusPlugin.register(with: registry.registrar(forPlugin: "ConnectivityPlusPlugin"))
   FilePickerPlugin.register(with: registry.registrar(forPlugin: "FilePickerPlugin"))
+  FileSaverPlugin.register(with: registry.registrar(forPlugin: "FileSaverPlugin"))
   FlutterSecureStorageDarwinPlugin.register(with: registry.registrar(forPlugin: "FlutterSecureStorageDarwinPlugin"))
 }

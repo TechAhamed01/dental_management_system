@@ -4,6 +4,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:dental_client/dental_client.dart';
 import 'dart:typed_data';
 import '../../../services/serverpod_client.dart';
+import 'package:http/http.dart' as http;
+import 'package:file_saver/file_saver.dart';
 
 class DentistAppointmentDetailsScreen extends StatefulWidget {
   final Appointment appointment;
@@ -82,9 +84,55 @@ class _DentistAppointmentDetailsScreenState extends State<DentistAppointmentDeta
         file.bytes!.buffer.asByteData(),
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Tooth image uploaded successfully.')),
-      );
+      // Simulate sending to CNN model via FastAPI backend
+      try {
+        final request = http.MultipartRequest(
+          'POST',
+          Uri.parse('http://localhost:8000/analyze'),
+        );
+        request.files.add(http.MultipartFile.fromBytes(
+          'file',
+          file.bytes!,
+          filename: file.name,
+        ));
+        
+        final response = await request.send();
+        
+        if (response.statusCode == 200) {
+          final pdfBytes = await response.stream.toBytes();
+          
+          await FileSaver.instance.saveFile(
+            name: 'analysis_report_${file.name.split('.').first}',
+            bytes: pdfBytes,
+            ext: 'pdf',
+            mimeType: MimeType.pdf,
+          );
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('AI Analysis Report generated and downloaded.')),
+            );
+          }
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Failed to generate AI report. Status: ${response.statusCode}')),
+            );
+          }
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error communicating with AI backend: $e')),
+          );
+        }
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Tooth image uploaded successfully.')),
+        );
+      }
       
       _fetchDentalImages();
     } catch (e) {
@@ -239,7 +287,17 @@ class _DentistAppointmentDetailsScreenState extends State<DentistAppointmentDeta
                     leading: const Icon(Icons.image, color: Color(0xff4F7DF3)),
                     title: Text(image.fileName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     subtitle: Text(DateFormat('MMM d, yyyy • HH:mm').format(image.uploadedAt), style: const TextStyle(fontSize: 12)),
-                    trailing: const Icon(Icons.download, size: 20, color: Colors.grey),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.picture_as_pdf, color: Colors.redAccent),
+                          tooltip: 'Download AI Report',
+                          onPressed: () => _downloadReportForExistingImage(image.fileName),
+                        ),
+                        const Icon(Icons.download, size: 20, color: Colors.grey),
+                      ],
+                    ),
                     onTap: () => _downloadAndPreviewImage(image.id!, image.fileName),
                   ),
                 );
@@ -248,6 +306,41 @@ class _DentistAppointmentDetailsScreenState extends State<DentistAppointmentDeta
         ],
       ),
     );
+  }
+
+  Future<void> _downloadReportForExistingImage(String fileName) async {
+    try {
+      final response = await http.get(Uri.parse('http://localhost:8000/report/$fileName'));
+      
+      if (response.statusCode == 200) {
+        final pdfBytes = response.bodyBytes;
+        
+        await FileSaver.instance.saveFile(
+          name: 'analysis_report_${fileName.split('.').first}',
+          bytes: pdfBytes,
+          ext: 'pdf',
+          mimeType: MimeType.pdf,
+        );
+        
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('AI Analysis Report downloaded.')),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to get report. Status: ${response.statusCode}')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error communicating with AI backend: $e')),
+        );
+      }
+    }
   }
 
   Future<void> _downloadAndPreviewImage(int imageId, String fileName) async {
